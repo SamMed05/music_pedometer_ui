@@ -5,23 +5,41 @@ import 'custom_app_bar.dart';
 import 'common_drawer.dart';
 
 // Thanks https://youtu.be/qdO1hwg2HY8
-class NavigationMenu extends StatelessWidget {
+class NavigationMenu extends StatefulWidget {
+  @override
+  _NavigationMenuState createState() => _NavigationMenuState();
+}
+
+class _NavigationMenuState extends State<NavigationMenu> {
+  // Create a PageController
+  final PageController _pageController = PageController();
+
+  // Thanks https://youtu.be/qdO1hwg2HY8
   @override
   Widget build(BuildContext context) {
     final NavigationController controller = Get.put(NavigationController());
+
     return Obx(
       () => Scaffold(
         appBar: CustomAppBar(
           title: (_getTitle(controller.selectedIndex.value)),
         ),
         drawer: CommonDrawer(),
-        body: IndexedStack(
-          index: controller.selectedIndex.value,
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            // Update the selected index when the page changes
+            controller.selectedIndex.value = index;
+          },
           children: controller.screens,
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: controller.selectedIndex.value,
-          onTap: (index) => controller.selectedIndex.value = index,
+          onTap: (index) {
+            // Update the PageView and BottomNavigationBar when an item is tapped
+            controller.selectedIndex.value = index;
+            _pageController.jumpToPage(index);
+          },
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playlist"),
@@ -30,6 +48,13 @@ class NavigationMenu extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the PageController when the widget is disposed
+    _pageController.dispose();
+    super.dispose();
   }
 
   String _getTitle(int index) {

@@ -55,7 +55,7 @@ class HomeScreen extends StatelessWidget {
             child: Align(
               alignment: Alignment.center,
               child: Image(
-                image: AssetImage("assets/images/placeholder1.png"),
+                image: AssetImage("assets/images/visualizer-placeholder.png"),
                 height: 300,
                 width: 360,
                 fit: BoxFit.cover,
