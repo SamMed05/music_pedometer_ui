@@ -19,42 +19,49 @@ class SongModel {
     required this.BPM,
   });
 
-  static List<SongModel> getSongs() { // With static this method can be accessed without instantiating the class
-    List<SongModel> songs = [];
+  static List<SongModel> _songs = [  // With "static" this method can be accessed without instantiating the class
+    SongModel(
+      isSelected: true,
+      coverImage: AssetImage("assets/images/music-icon.png"),
+      sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
+      songName: "Song 1",
+      artistName: "Artist 1",
+      BPM: 135
+    ),
+    SongModel(
+      isSelected: false,
+      coverImage: AssetImage("assets/images/music-icon.png"),
+      sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
+      songName: "Song 2",
+      artistName: "Artist 2",
+      BPM: 90
+    ),
+    SongModel(
+      isSelected: true,
+      coverImage: AssetImage("assets/images/music-icon.png"),
+      sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
+      songName: "Song 3",
+      artistName: "Artist 3",
+      BPM: 122
+    ),
+  ];
+  
+  static SongModel? _mostRecentSong;
 
-    songs.add(
-      SongModel(
-        isSelected: true,
-        coverImage: AssetImage("assets/images/music-icon.png"),
-        sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
-        songName: "Song 1",
-        artistName: "Artist 1",
-        BPM: 135
-      )
-    );
-    songs.add(
-      SongModel(
-        isSelected: false,
-        coverImage: AssetImage("assets/images/music-icon.png"),
-        sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
-        songName: "Song 2",
-        artistName: "Artist 2",
-        BPM: 90
-      )
-    );
-    songs.add(
-      SongModel(
-        isSelected: true,
-        coverImage: AssetImage("assets/images/music-icon.png"),
-        sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
-        songName: "Song 3",
-        artistName: "Artist 3",
-        BPM: 122
-      )
-    );
-    // songs.add( ...
+  // Get all songs
+  static List<SongModel> getSongs() {
+    return _songs;
+  }
 
-    return songs;
+  // Add a new song
+  static void addSong(SongModel song) {
+    _songs.add(song);
+
+    _mostRecentSong = song;
+  }
+
+  // Get most recent song
+  static SongModel? getMostRecentSong() {
+    return _mostRecentSong;
   }
 }
-

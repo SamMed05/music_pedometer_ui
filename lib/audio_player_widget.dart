@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final String url;
@@ -28,11 +29,11 @@ class AudioPlayerWidget extends StatefulWidget {
 
 class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   // AudioPlayer audioPlayer = AudioPlayer();
-  late AudioPlayer audioPlayer;
+  final audioPlayer = AudioPlayer();
   bool _isPlaying = false;
   bool _isLooping = false;
-  Duration duration = Duration.zero;
   Duration position = Duration.zero;
+  Duration duration = Duration.zero;
 
   // @override
   // void initState() {
@@ -41,19 +42,48 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   @override
   void initState() {
     super.initState();
-    audioPlayer = AudioPlayer();
+
+    // Listen to states: playing, paused, stopped
+    audioPlayer.playerStateStream.listen((playerState) {
+      setState(() {
+        _isPlaying = playerState == playerState.playing;
+        // totalDuration = audioPlayer.duration ?? Duration.zero;
+        // currentPosition = audioPlayer.position ?? Duration.zero;
+      });
+    });
+
+    // Listen for duration changes
+    audioPlayer.durationStream.listen((newDuration) {
+      // if (mounted) {
+        // Check the "mounted" property of this object before calling setState() to ensure the object is still in the tree
+        setState(() {
+          duration = newDuration ?? Duration.zero;
+        });
+      // }
+    });
+
+    audioPlayer.positionStream.listen((newPosition) {
+      setState(() {
+          position = newPosition;
+        });
+    });
 
     // Set initial loop mode
     audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
 
-    audioPlayer.positionStream.listen((duration) {
-      if (mounted) {
-        // Check the "mounted" property of this object before calling setState() to ensure the object is still in the tree
-        setState(() {
-          this.duration = duration ?? Duration.zero;
-        });
-      }
-    });
+    // Set the audio source with the MediaItem tag
+    audioPlayer.setAudioSource(
+      AudioSource.uri(
+        Uri.parse(widget.url),
+        tag: MediaItem(
+          id: '1',  // Assign a unique ID for each media item
+          album: 'Album name',
+          title: widget.songTitle,
+          artist: widget.songArtist,
+          artUri: Uri.parse('https://example.com/albumart.jpg'),  // Replace with your album art URL
+        ),
+      ),
+    );
   }
 
   @override
@@ -62,25 +92,15 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     super.dispose();
   }
 
-  // void _togglePlayback()  {
-  //   if (_isPlaying) {
-  //      audioPlayer.pause();
-  //   } else {
-  //      audioPlayer.setUrl(widget.url);
-  //      audioPlayer.play();
-
-  //     setState(() {
-  //       _isPlaying = !_isPlaying;
-  //     });
-  //   }
-  // }
-
-  void _togglePlayback()  {
+  void _togglePlayback() {
     if (_isPlaying) {
        audioPlayer.pause();
     } else {
-       audioPlayer.setUrl(widget.url);
+      //  audioPlayer.setUrl(widget.url);
        audioPlayer.play();
+      //  setState(() {
+      //    _isPlaying = !_isPlaying;
+      //  });
     }
 
     if (mounted) {
@@ -90,7 +110,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     }
   }
 
-  // void _toggleLoopMode()  {
+  // void _toggleLoopMode() {
   //   _isLooping = !_isLooping;
   //    audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
 
@@ -176,7 +196,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                                   // '$widget.songArtist',
                                   widget.songArtist,
                                 ),
-                                Text(formatTime(duration)),
+                                Text(formatTime(duration)), // Or duration - position to get the remaining time of the song
                               ],
                             ),
                             SizedBox(height: 5),

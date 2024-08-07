@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'audio_player_widget.dart';
 // import 'playlist.dart'; // To play the song loaded from the playlist
+import 'models/song_model.dart';
+// import 'package:just_audio_background/just_audio_background.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,6 +12,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   double playbackRate = 1;
+  
+  
+  // Get the most recently added song
+  late SongModel? mostRecentSong;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the most recent song
+    mostRecentSong = SongModel.getMostRecentSong();
+  }
+
+  void _updateMostRecentSong() {
+    setState(() {
+      mostRecentSong = SongModel.getMostRecentSong();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: Column(
           children: [
-            Expanded(
-              child: TabBarView( // Without this everything is white
+            Expanded( // Without this everything is white
+              child: TabBarView(
                 children: <Widget>[
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -71,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Align(
                           alignment: Alignment.center,
                           child: Text(
-                            "This visualization represents your current step frequency (SPM) compared to the original BPM (tempo) of the song.",
+                            "This visualization represents your current step frequency (SPM) compared to the original BPM (tempo) of the song",
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.clip,
                             style: TextStyle(
@@ -109,60 +129,62 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Padding(
-              // TODO It's maybe better to implement the audio fetching outside in a separate function
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              child: AudioPlayerWidget(
-                url: Uri.parse("asset:///assets/audio-example.mp3").toString(),
-                // iconColor: Color(0xff000000),
-                // activeTrackColor: Color(0xff000000),
-                // inactiveTrackColor: Color(0xffe0e0e0),
-                // thumbColor: Color(0xff000000),
-                // iconSize: 42,
-                songTitle: "Song Title",
-                songArtist: "Song Artist",
+              child: Column(
+                children: [
+                  // AudioPlayerWidget(
+                  //   url: Uri.parse("asset:///assets/audio-example.mp3").toString(),
+                  //   songTitle: "Song Title",
+                  //   songArtist: "Song Artist",
+                  // ),
+                  mostRecentSong != null
+                    ? AudioPlayerWidget(
+                        url: Uri.parse(mostRecentSong!.sourceFilePath).toString(),
+                        songTitle: mostRecentSong!.songName,
+                        songArtist: mostRecentSong!.artistName,
+                      )
+                    : Text("No songs available. Import one from the playlist page ➡️"),
+                ],
               ),
             ),
           ],
         ),
-        bottomNavigationBar: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          child: SwitchListTile(
-            value: true,
-            title: Text(
-              "Activate Sync",
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontStyle: FontStyle.normal,
-                fontSize: 15,
-                color: Color(0xff000000),
-              ),
-              textAlign: TextAlign.start,
+        bottomNavigationBar: SwitchListTile(
+          value: true,
+          title: Text(
+            "Activate Sync",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontStyle: FontStyle.normal,
+              fontSize: 15,
+              color: Color(0xff000000),
             ),
-            subtitle: Text(
-              "Synch music BPM to your steps",
-              style: TextStyle(
-                fontWeight: FontWeight.w300,
-                fontStyle: FontStyle.normal,
-                fontSize: 13,
-                color: Color(0xff000000),
-              ),
-              textAlign: TextAlign.start,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-            onChanged: (value) {},
-            controlAffinity: ListTileControlAffinity.trailing,
-            dense: true,
-            activeColor: Theme.of(context).colorScheme.onPrimary,
-            activeTrackColor: Theme.of(context).colorScheme.primary,
-            inactiveThumbColor: Theme.of(context).colorScheme.secondary,
-            inactiveTrackColor: Theme.of(context).canvasColor,
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-            secondary: Icon(Icons.timer, color: Color(0xff000000), size: 24),
-            selected: false,
-            selectedTileColor: Color(0x42000000),
+            textAlign: TextAlign.start,
           ),
+          subtitle: Text(
+            "Sync music BPM to your steps",
+            style: TextStyle(
+              fontWeight: FontWeight.w300,
+              fontStyle: FontStyle.normal,
+              fontSize: 13,
+              color: Color(0xff000000),
+            ),
+            textAlign: TextAlign.start,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+          onChanged: (value) {},
+          controlAffinity: ListTileControlAffinity.trailing,
+          dense: true,
+          activeColor: Theme.of(context).colorScheme.onPrimary,
+          activeTrackColor: Theme.of(context).colorScheme.primary,
+          inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+          inactiveTrackColor: Theme.of(context).canvasColor,
+          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+          secondary: Icon(Icons.timer, color: Color(0xff000000), size: 24),
+          selected: false,
+          selectedTileColor: Color(0x42000000),
         ),
       ),
     );

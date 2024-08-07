@@ -12,24 +12,22 @@ class Playlist extends StatefulWidget {
 class _PlaylistState extends State<Playlist> {
   List<SongModel> songs = [];
   bool onlyCompatibleSongs = true;
+  
   FilePickerResult? songResult; // ? operator means that NULL is allowed (see https://dart.dev/null-safety)
   String _fileName = '';
 
-  void _getSongs() {
-    songs = SongModel.getSongs();
+  @override
+  void initState() {
+    super.initState();
+    _getSongs();
   }
-  // or
-  // void _getSongs() {
-  //   setState(() {
-  //     songs = SongModel.getSongs();
-  //   });
-  // }
 
-  // not needed
-  // @override
-  // void initState() {
-  //   _getSongs();
-  // }
+  void _getSongs() {
+    // songs = SongModel.getSongs();
+    setState(() {
+      songs = SongModel.getSongs();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +53,7 @@ class _PlaylistState extends State<Playlist> {
               textAlign: TextAlign.start,
             ),
             subtitle: Text(
-              "Recommend songs with tempo matching your current SPM",
+              "Recommend songs that are in your current SPM range",
               style: TextStyle(
                 fontWeight: FontWeight.w300,
                 fontStyle: FontStyle.normal,
@@ -135,41 +133,149 @@ class _PlaylistState extends State<Playlist> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           pickFile();
-          // TODO Make the SnackBar appear AFTER the user finishes loading a file (then adapt displayed text based on the result)
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: songResult == null 
-                  ? const Text('No song chosen') 
-                  : Text ('Imported song ' + songResult!.files.single.name), // ! operator means songResult can't be NULL
-              // action: SnackBarAction(
-              //   label: 'Undo',
-              //   onPressed: () {
-              //     // Some code to undo the change.
-              //   },
-              // ),
-            ),
-          );
         },
-        child: const Icon(Icons.audio_file),
+        backgroundColor: Theme.of(context).canvasColor,
+        child: const Icon(Icons.audio_file, color: Colors.black),
       ),
     );
   }
-  
+
   void pickFile() async {
     final songResult = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.custom,
       allowedExtensions: ['mp3', 'wav', 'ogg'], // https://developer.android.com/media/media3/exoplayer/supported-formats and https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/MultimediaPG/UsingAudio/UsingAudio.html
     );
-    setState(() {});
+    // setState(() {});
+    
+    // if (songResult != null) {
+    //   final path = songResult.files.single.path!;
+    //   _fileName = songResult.files.single.name;
+    //   setState(() {}); // Update state
+
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text('Imported song ' + _fileName),
+    //     ),
+    //   );
+    // } else {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: const Text('No song chosen'),
+    //     ),
+    //   );
+    // }
     if (songResult != null) {
-      final path = songResult!.files.single.path!;
-      _fileName = songResult.files.single.name;
-      setState(() {}); // Update state
+      final path = songResult.files.single.path!;
+      final fileName = songResult.files.single.name;
+
+      // Create a new SongModel instance with default values
+      final newSong = SongModel(
+        isSelected: true,
+        coverImage: AssetImage("assets/images/music-icon.png"), // Placeholder image
+        sourceFilePath: path,
+        songName: fileName,
+        artistName: "-", // Default or empty value
+        BPM: 0, // Default or empty value
+      );
+
+      // // Add the new song to the model
+      // SongModel.addSong(newSong);
+
+      // // Update the UI
+      // setState(() {
+      //   songs = SongModel.getSongs();
+      // });
+
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Imported song ' + fileName),
+      //   ),
+      // );
+      
+      // Show dialog to enter BPM
+      bool isSongAdded = await _showBPMDialog(newSong);
+
+      if (isSongAdded) {
+        // Add the new song to the model only if the BPM is set
+        SongModel.addSong(newSong);
+        setState(() {
+          songs = SongModel.getSongs();
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Imported song ' + fileName),
+          ),
+        );
+      }
     } else {
-      // User canceled the picker
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('No song chosen'),
+        ),
+      );
     }
   }
+
+
+  Future<bool> _showBPMDialog(SongModel song) async {
+    final TextEditingController bpmController = TextEditingController(); // To control the text that is displayed in the text field
+    bool isSongAdded = false;
+
+    // Use await, otherwise when showDialog is called, the execution of the surrounding code 
+    // (like the SnackBar calls) continues without waiting for the dialog to be dismissed
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter BPM for ${song.songName}'),
+          content: TextField(
+            controller: bpmController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: 'Enter the BPM of the song (required)',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                final bpm = double.tryParse(bpmController.text) ?? 0;
+
+                // Prevent user from entering 0 BPM (or inserting a song by pressing OK without entering any value)
+                if (bpm == 0) {
+                  Navigator.of(context).pop();
+                } else {
+                  setState(() {
+                    // Update the BPM of the song
+                    song.BPM = bpm;
+                  });
+
+                  // Update the song in the model
+                  // SongModel.addSong(song);
+
+                  isSongAdded = true; // Set to true only when OK is pressed
+
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                isSongAdded = false; // Set to false if Cancel is pressed
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    return isSongAdded;
+  }
+
 
   Column SongItem(int index, bool isChecked) {
     return Column(
@@ -224,9 +330,11 @@ class _PlaylistState extends State<Playlist> {
                           color: Color(0x1f000000),
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Color(0x4d9e9e9e), width: 0),
+                          border:
+                              Border.all(color: Color(0x4d9e9e9e), width: 0),
                         ),
-                        child: ClipRRect( // Make rounded corners in the album cover images
+                        child: ClipRRect(
+                          // Make rounded corners in the album cover images
                           borderRadius: BorderRadius.circular(8),
                           child: Image(
                             image: songs[index].coverImage,
@@ -239,8 +347,8 @@ class _PlaylistState extends State<Playlist> {
                       Expanded(
                         flex: 1,
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 10),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,7 +391,7 @@ class _PlaylistState extends State<Playlist> {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                    color: Color.fromARGB(41, 128, 128, 128),
+                  color: Color.fromARGB(41, 128, 128, 128),
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(color: Color(0x4d9e9e9e), width: 0),
