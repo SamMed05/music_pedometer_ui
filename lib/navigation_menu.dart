@@ -40,9 +40,33 @@ class _NavigationMenuState extends State<NavigationMenu> {
             _pageController.jumpToPage(index);
           },
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playlist"),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Options"),
+            BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: Icon(
+                    Icons.home_filled,
+                    size: 29,
+                  ),
+                ),
+                label: "Home"),
+            BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: Icon(
+                    Icons.format_list_bulleted_sharp,
+                    size: 29,
+                  ),
+                ),
+                label: "Playlist"),
+            BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: Icon(
+                    Icons.settings,
+                    size: 29,
+                  ),
+                ),
+                label: "Options"),
           ],
         ),
       ),

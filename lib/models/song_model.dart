@@ -26,7 +26,7 @@ class SongModel {
       SongModel(
         isSelected: true,
         coverImage: AssetImage("assets/images/music-icon.png"),
-        sourceFilePath: Uri.parse("asset:///assets/your_audio3.mp3").toString(),
+        sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
         songName: "Song 1",
         artistName: "Artist 1",
         BPM: 135
@@ -36,7 +36,7 @@ class SongModel {
       SongModel(
         isSelected: false,
         coverImage: AssetImage("assets/images/music-icon.png"),
-        sourceFilePath: Uri.parse("asset:///assets/your_audio3.mp3").toString(),
+        sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
         songName: "Song 2",
         artistName: "Artist 2",
         BPM: 90
@@ -46,7 +46,7 @@ class SongModel {
       SongModel(
         isSelected: true,
         coverImage: AssetImage("assets/images/music-icon.png"),
-        sourceFilePath: Uri.parse("asset:///assets/your_audio3.mp3").toString(),
+        sourceFilePath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
         songName: "Song 3",
         artistName: "Artist 3",
         BPM: 122

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'dart:async';
-import 'package:file_picker/file_picker.dart';
+import 'audio_player_widget.dart';
+// import 'playlist.dart'; // To play the song loaded from the playlist
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -18,17 +18,22 @@ class _HomeScreenState extends State<HomeScreen> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('TabBar Sample'),
-          bottom: const TabBar(
+          // title: Text('TabBar'),
+          toolbarHeight: 0, // Remove empty white space
+          elevation: 4,
+          bottom: TabBar(
             tabs: <Widget>[
               Tab(
-                icon: Icon(Icons.cloud_outlined),
+                icon: Icon(Icons.monitor_heart_sharp),
+                text: "Rhythm",
               ),
               Tab(
-                icon: Icon(Icons.beach_access_sharp),
+                icon: Icon(Icons.directions_walk_sharp),
+                text: "Steps",
               ),
               Tab(
-                icon: Icon(Icons.brightness_5_sharp),
+                icon: Icon(Icons.bar_chart_sharp),
+                text: "Movement data",
               ),
             ],
           ),
@@ -36,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Column(
           children: [
             Expanded(
-              child: TabBarView(
+              child: TabBarView( // Without this everything is white
                 children: <Widget>[
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -108,11 +113,13 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: AudioPlayerWidget(
                 url: Uri.parse("asset:///assets/audio-example.mp3").toString(),
-                iconColor: Color(0xff000000),
-                activeTrackColor: Color(0xff525252),
-                inactiveTrackColor: Color(0xffe0e0e0),
-                thumbColor: Color(0xff000000),
-                iconSize: 42,
+                // iconColor: Color(0xff000000),
+                // activeTrackColor: Color(0xff000000),
+                // inactiveTrackColor: Color(0xffe0e0e0),
+                // thumbColor: Color(0xff000000),
+                // iconSize: 42,
+                songTitle: "Song Title",
+                songArtist: "Song Artist",
               ),
             ),
           ],
@@ -136,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontWeight: FontWeight.w300,
                 fontStyle: FontStyle.normal,
-                fontSize: 11,
+                fontSize: 13,
                 color: Color(0xff000000),
               ),
               textAlign: TextAlign.start,
@@ -157,115 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
             selectedTileColor: Color(0x42000000),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class AudioPlayerWidget extends StatefulWidget {
-  final String url;
-  final Color iconColor;
-  final Color activeTrackColor;
-  final Color inactiveTrackColor;
-  final Color thumbColor;
-  final double iconSize;
-
-  AudioPlayerWidget({
-    required this.url,
-    required this.iconColor,
-    required this.activeTrackColor,
-    required this.inactiveTrackColor,
-    required this.thumbColor,
-    required this.iconSize,
-  });
-
-  @override
-  _AudioPlayerWidgetState createState() => _AudioPlayerWidgetState();
-}
-
-class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
-  // late AudioPlayer audioPlayer;
-  AudioPlayer audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
-
-  // late StreamSubscription<Duration?> positionSubscription;
-
-  @override
-  void initState() {
-    // super.initState();
-    // audioPlayer = AudioPlayer();
-
-    // positionSubscription = audioPlayer.positionStream.listen((duration) {
-    //   if (mounted) {
-    //     setState(() {});
-    //   }
-    // });
-  }
-
-  @override
-  void dispose() {
-    audioPlayer.dispose();
-    super.dispose();
-  }
-
-  void _togglePlayback() async {
-    if (_isPlaying) {
-      await audioPlayer.pause();
-    } else {
-      await audioPlayer.setUrl(widget.url);
-      await audioPlayer.play();
-
-      setState(() {
-        _isPlaying = !_isPlaying;
-      });
-    }
-  }
-
-  // TODO Can't do this now, since songResult is in playlist.dart
-  // void playAudio() {
-  //   if (songResult != null) {
-  //     audioPlayer.play(DeviceFileSource(songResult!.files.single.path!));
-  //   }
-  // }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: Icon(
-              _isPlaying ? Icons.pause : Icons.play_arrow,
-              color: widget.iconColor,
-              size: widget.iconSize,
-            ),
-            onPressed: _togglePlayback,
-          ),
-          Expanded(
-            child: StreamBuilder<Duration?>(
-              stream: audioPlayer.positionStream,
-              builder: (context, snapshot) {
-                final duration = snapshot.data ?? Duration.zero;
-                return Slider(
-                  value: duration.inSeconds.toDouble(),
-                  min: 0,
-                  max: (audioPlayer.duration?.inSeconds ?? 0).toDouble(),
-                  activeColor: widget.activeTrackColor,
-                  inactiveColor: widget.inactiveTrackColor,
-                  thumbColor: widget.thumbColor,
-                  onChanged: (value) {
-                    audioPlayer.seek(Duration(seconds: value.toInt()));
-                  },
-                );
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

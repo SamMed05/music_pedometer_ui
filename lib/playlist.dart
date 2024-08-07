@@ -43,9 +43,9 @@ class _PlaylistState extends State<Playlist> {
         mainAxisSize: MainAxisSize.max,
         children: [
           SwitchListTile(
-            value: true,
+            value: false,
             title: Text(
-              "Only compatible",
+              "Only compatible songs",
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontStyle: FontStyle.normal,
@@ -59,7 +59,7 @@ class _PlaylistState extends State<Playlist> {
               style: TextStyle(
                 fontWeight: FontWeight.w300,
                 fontStyle: FontStyle.normal,
-                fontSize: 11,
+                fontSize: 13,
                 color: Color(0xff000000),
               ),
               textAlign: TextAlign.start,
