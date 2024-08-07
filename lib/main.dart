@@ -1,68 +1,33 @@
-// import 'package:flutter/material.dart';
-// import 'home_screen.dart';
-// import 'playlist.dart';
-// import 'options.dart';
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Music Pedometer',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: HomeScreen(),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'playlist.dart';
-import 'options.dart';
+import 'navigation_menu.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Music Pedometer',
       theme: ThemeData(
-        // primarySwatch: Colors.blue,
         primaryColor: Colors.black,
+        canvasColor: Color.fromARGB(255, 231, 231, 231),  // Background color for material components
         useMaterial3: true,
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder>{
-            // https://api.flutter.dev/flutter/material/PageTransitionsBuilder-class.html
-            // https://api.flutter.dev/flutter/material/PageTransitionsTheme-class.html
-            // TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
-            // TargetPlatform.linux: ZoomPageTransitionsBuilder(),
-            // TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
-            TargetPlatform.android: ZoomPageTransitionsBuilder(),
-            // TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
-            // TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-            // TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
-            // TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
-          },
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.black,
+          primary: Colors.black, // Primary color
+          onPrimary: Colors.white, // Text color on primary
+          secondary: Colors.grey, // Secondary color
+          onSecondary: Colors.black, // Text color on secondary
+          surface: Colors.white, // Background color
+          onSurface: Colors.black, // Text color on surface
+          error: Colors.red, // Error color
+          onError: Colors.white, // Text color on error
         ),
+        scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => HomeScreen(),
-        '/playlist': (context) => Playlist(),
-        '/options': (context) => Options(),
-      },
+      home: NavigationMenu(),
     );
   }
 }

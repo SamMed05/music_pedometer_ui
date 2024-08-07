@@ -1,73 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-
-import 'dart:async'; // https://api.flutter.dev/flutter/dart-async/dart-async-library.html
+// import 'custom_app_bar.dart';
+// import 'common_drawer.dart';
+import 'dart:async';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key}); // unique identifier that is attached to widgets to help Flutter distinguish between different widgets and track changes efficiently when the UI rebuilds
-  List<BottomNavigationBarItem> bottomNavigationBarItems = [
-    BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-    BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playlist"),
-    BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Options")
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffffffff),
-      appBar: AppBar(
-        elevation: 4,
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        backgroundColor: Color(0xff000000),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-        ),
-        title: Text(
-          "Music Pedometer",
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontStyle: FontStyle.normal,
-            fontSize: 14,
-            color: Color(0xffffffff),
-          ),
-        ),
-        leading: Icon(
-          Icons.menu,
-          color: Color(0xffffffff),
-          size: 24,
-        ),
-        actions: [
-          Icon(Icons.account_circle, color: Color(0xffffffff), size: 24),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: bottomNavigationBarItems,
-        backgroundColor: Color(0xffe0e0e0),
-        currentIndex: 0,
-        elevation: 10,
-        iconSize: 24,
-        selectedItemColor: Color(0xff000000),
-        unselectedItemColor: Color(0xff525252),
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        // onTap: (value) {},
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacementNamed(context, '/');
-              break;
-            case 1:
-              Navigator.pushReplacementNamed(context, '/playlist');
-              break;
-            case 2:
-              Navigator.pushReplacementNamed(context, '/options');
-              break;
-          }
-        },
-      ),
+      // backgroundColor: Color(0xffffffff),
+      // appBar: CustomAppBar(title: "Playlist"),
+      // drawer: CommonDrawer(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,8 +56,8 @@ class HomeScreen extends StatelessWidget {
               alignment: Alignment.center,
               child: Image(
                 image: AssetImage("assets/images/placeholder1.png"),
-                height: 200,
-                width: 240,
+                height: 300,
+                width: 360,
                 fit: BoxFit.cover,
               ),
             ),
@@ -122,7 +65,6 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: AudioPlayerWidget(
-              // url: "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3",
               url: Uri.parse("asset:///assets/audio-example.mp3").toString(),
               iconColor: Color(0xff000000),
               activeTrackColor: Color(0xff525252),
@@ -131,45 +73,53 @@ class HomeScreen extends StatelessWidget {
               iconSize: 42,
             ),
           ),
-          SwitchListTile(
-            value: true,
-            title: Text(
-              "Activate Sync",
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontStyle: FontStyle.normal,
-                fontSize: 15,
-                color: Color(0xff000000),
-              ),
-              textAlign: TextAlign.start,
-            ),
-            subtitle: Text(
-              "Synch music BPM to your steps",
-              style: TextStyle(
-                fontWeight: FontWeight.w300,
-                fontStyle: FontStyle.normal,
-                fontSize: 11,
-                color: Color(0xff000000),
-              ),
-              textAlign: TextAlign.start,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-            onChanged: (value) {},
-            tileColor: Color(0x1fffffff),
-            activeColor: Color(0xff000000),
-            activeTrackColor: Color(0xff9d9d9d),
-            controlAffinity: ListTileControlAffinity.trailing,
-            dense: true,
-            inactiveThumbColor: Color(0xff9e9e9e),
-            inactiveTrackColor: Color(0xffe0e0e0),
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-            secondary: Icon(Icons.timer, color: Color(0xff212435), size: 24),
-            selected: false,
-            selectedTileColor: Color(0x42000000),
-          ),
         ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        child: SwitchListTile(
+          value: true,
+          title: Text(
+            "Activate Sync",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontStyle: FontStyle.normal,
+              fontSize: 15,
+              color: Color(0xff000000),
+            ),
+            textAlign: TextAlign.start,
+          ),
+          subtitle: Text(
+            "Synch music BPM to your steps",
+            style: TextStyle(
+              fontWeight: FontWeight.w300,
+              fontStyle: FontStyle.normal,
+              fontSize: 11,
+              color: Color(0xff000000),
+            ),
+            textAlign: TextAlign.start,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+          onChanged: (value) {},
+          // tileColor: Color(0x1fffffff),
+          // activeColor: Color(0xff000000),
+          // activeTrackColor: Color(0xff9d9d9d),
+          controlAffinity: ListTileControlAffinity.trailing,
+          dense: true,
+          // inactiveThumbColor: Color(0xff9e9e9e),
+          // inactiveTrackColor: Color(0xffe0e0e0),
+          // tileColor: Color(0x1fffffff),
+          activeColor: Theme.of(context).colorScheme.primary,
+          activeTrackColor: Theme.of(context).colorScheme.secondary,
+          inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+          inactiveTrackColor: Theme.of(context).canvasColor,
+          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+          secondary: Icon(Icons.timer, color: Color(0xff000000), size: 24),
+          selected: false,
+          selectedTileColor: Color(0x42000000),
+        ),
       ),
     );
   }
@@ -200,17 +150,14 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   late AudioPlayer _audioPlayer;
   bool _isPlaying = false;
 
-
-  late StreamSubscription<Duration?> _positionSubscription;
+  late StreamSubscription<Duration?> positionSubscription;
 
   @override
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
-
-    _positionSubscription = _audioPlayer.positionStream.listen((duration) {
+    positionSubscription = _audioPlayer.positionStream.listen((duration) {
       if (mounted) {
         setState(() {});
       }
@@ -230,17 +177,12 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       await _audioPlayer.setUrl(widget.url);
       await _audioPlayer.play();
 
-
       if (mounted) {
         setState(() {
           _isPlaying = !_isPlaying;
         });
       }
     }
-
-    // setState(() {
-    //   _isPlaying = !_isPlaying;
-    // });
   }
 
   @override

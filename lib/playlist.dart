@@ -1,76 +1,27 @@
 import 'package:flutter/material.dart';
+// import 'custom_app_bar.dart';
+// import 'common_drawer.dart';
 
-class Playlist extends StatelessWidget {
-  List<BottomNavigationBarItem> bottomNavigationBarItems = [
-    BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-    BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playlist"),
-    BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Options")
-  ];
+class Playlist extends StatefulWidget {
+  @override
+  _PlaylistState createState() => _PlaylistState();
+}
+
+class _PlaylistState extends State<Playlist> {
+  bool onlyCompatible = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffffffff),
-      appBar: AppBar(
-        elevation: 4,
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        backgroundColor: Color(0xff000000),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-        ),
-        title: Text(
-          "Music Pedometer",
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontStyle: FontStyle.normal,
-            fontSize: 14,
-            color: Color(0xffffffff),
-          ),
-        ),
-        leading: Icon(
-          Icons.menu,
-          color: Color(0xffffffff),
-          size: 24,
-        ),
-        actions: [
-          Icon(Icons.account_circle, color: Color(0xffffffff), size: 24),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: bottomNavigationBarItems,
-        backgroundColor: Color(0xffe0e0e0),
-        currentIndex: 1,
-        elevation: 10,
-        iconSize: 24,
-        selectedItemColor: Color(0xff000000),
-        unselectedItemColor: Color(0xff525252),
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        // onTap: (value) {},
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacementNamed(context, '/');
-              break;
-            case 1:
-              Navigator.pushReplacementNamed(context, '/playlist');
-              break;
-            case 2:
-              Navigator.pushReplacementNamed(context, '/options');
-              break;
-          }
-        },
-      ),
+      // appBar: CustomAppBar(title: "Playlist"),
+      // drawer: CommonDrawer(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: [
-          SwitchListTile(
-            value: true,
+          ListTile(
             title: Text(
               "Only compatible",
               style: TextStyle(
@@ -79,7 +30,6 @@ class Playlist extends StatelessWidget {
                 fontSize: 15,
                 color: Color(0xff000000),
               ),
-              textAlign: TextAlign.start,
             ),
             subtitle: Text(
               "Recommend songs with tempo matching your current SPM",
@@ -89,24 +39,21 @@ class Playlist extends StatelessWidget {
                 fontSize: 11,
                 color: Color(0xff000000),
               ),
-              textAlign: TextAlign.start,
             ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
+            trailing: Switch(
+              value: onlyCompatible,
+              onChanged: (value) {
+                setState(() {
+                  onlyCompatible = value;
+                });
+              },
+              // activeColor: Color(0xff000000),
+              // activeTrackColor: Color(0xff9d9d9d),
+              activeColor: Theme.of(context).colorScheme.primary,
+              activeTrackColor: Theme.of(context).colorScheme.secondary,
+              inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+              inactiveTrackColor: Theme.of(context).canvasColor,
             ),
-            onChanged: (value) {},
-            tileColor: Color(0x1fffffff),
-            activeColor: Color(0xff000000),
-            activeTrackColor: Color(0xff9d9d9d),
-            controlAffinity: ListTileControlAffinity.trailing,
-            dense: true,
-            inactiveThumbColor: Color(0xff9e9e9e),
-            inactiveTrackColor: Color(0xffe0e0e0),
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-            secondary: Icon(Icons.filter_alt_outlined,
-                color: Color(0xff212435), size: 24),
-            selected: false,
-            selectedTileColor: Color(0x42000000),
           ),
           Expanded(
             flex: 1,
@@ -124,7 +71,14 @@ class Playlist extends StatelessWidget {
   }
 }
 
-class SongItem extends StatelessWidget {
+class SongItem extends StatefulWidget {
+  @override
+  _SongItemState createState() => _SongItemState();
+}
+
+class _SongItemState extends State<SongItem> {
+  bool isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -140,13 +94,17 @@ class SongItem extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(5),
               child: Checkbox(
-                onChanged: (value) {},
+                onChanged: (value) {
+                  setState(() {
+                    isChecked = value!;
+                  });
+                },
                 activeColor: Color(0xff000000),
                 autofocus: false,
                 checkColor: Color(0xffffffff),
                 hoverColor: Color(0x42000000),
                 splashRadius: 20,
-                value: true,
+                value: isChecked,
               ),
             ),
             Expanded(
@@ -217,12 +175,12 @@ class SongItem extends StatelessWidget {
               alignment: Alignment.center,
               margin: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
               padding: EdgeInsets.all(3),
-              width: 40,
-              height: 40,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: Color(0x1f000000),
                 shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(100.0),
+                borderRadius: BorderRadius.circular(100),
                 border: Border.all(color: Color(0x4d9e9e9e), width: 1),
               ),
               child: Text(
