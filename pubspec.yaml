@@ -18,6 +18,7 @@ dependencies:
   package_info_plus: ^8.0.1
   just_audio_background: ^0.0.1-beta.13
   provider: ^6.1.2
+  # pedometer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

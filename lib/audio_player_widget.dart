@@ -35,7 +35,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 IconButton(
                   icon: Icon(
                     Icons.loop,
-                    color: playlistProvider.isLooping ? const Color.fromARGB(255, 0, 0, 0) : Colors.grey,
+                    // TODO Fix colors in dark mode
+                    color: playlistProvider.isLooping ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
                   ),
                   onPressed: playlistProvider.toggleLooping,
                 ),
@@ -102,10 +103,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                                       value: position.inSeconds.toDouble(),
                                       min: 0,
                                       max: duration.inSeconds.toDouble(),
-                                      // TODO Fix colors for light/dark modes
-                                      activeColor: Color(0xff000000),
-                                      inactiveColor: Color(0xffe0e0e0),
-                                      thumbColor: Color(0xff000000),
+                                      // activeColor: Color(0xff000000),
+                                      inactiveColor: Color.fromARGB(135, 190, 190, 190),
+                                      // thumbColor: Color(0xff000000),
                                       onChanged: (value) {
                                         // When the user is sliding
                                         audioPlayer.seek(Duration(seconds: value.toInt()));

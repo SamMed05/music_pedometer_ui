@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Align(
                           alignment: Alignment.center,
                           child: Text(
-                            "This visualization represents your current step frequency (SPM) compared to the original BPM (tempo) of the song",
+                            "This is your current step frequency (SPM) compared to the original BPM (tempo) of the song",
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.clip,
                             style: TextStyle(
@@ -104,6 +104,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+            ),
+            Divider(
+              // See https://api.flutter.dev/flutter/material/Divider-class.html
+              height: 10,
+              thickness: 1,
+              color: Theme.of(context).colorScheme.onSecondary,
+              // indent: 40,
+              // endIndent: 40,
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
