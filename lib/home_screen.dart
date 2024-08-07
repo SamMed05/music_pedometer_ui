@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'audio_player_widget.dart';
-// import 'playlist.dart'; // To play the song loaded from the playlist
 import 'models/song_model.dart';
-// import 'package:just_audio_background/just_audio_background.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -45,15 +42,15 @@ class _HomeScreenState extends State<HomeScreen> {
             tabs: <Widget>[
               Tab(
                 icon: Icon(Icons.monitor_heart_sharp),
-                text: "Rhythm",
+                // text: "Rhythm",
               ),
               Tab(
                 icon: Icon(Icons.directions_walk_sharp),
-                text: "Steps",
+                // text: "Steps",
               ),
               Tab(
                 icon: Icon(Icons.bar_chart_sharp),
-                text: "Movement data",
+                // text: "Accelerometer",
               ),
             ],
           ),
@@ -69,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
-                        padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                        padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
                         child: Align(
                           alignment: Alignment.center,
                           child: Text(
@@ -79,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontStyle: FontStyle.normal,
-                              fontSize: 25,
+                              fontSize: 23,
                               color: Color(0xff000000),
                             ),
                           ),
@@ -87,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Padding(
                         padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                         child: Align(
                           alignment: Alignment.center,
                           child: Text(
@@ -111,8 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Image(
                             image: AssetImage(
                                 "assets/images/visualizer-placeholder.png"),
-                            height: 250,
-                            width: 300,
+                            height: 230,
+                            width: 280,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -133,14 +130,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 children: [
                   // AudioPlayerWidget(
-                  //   url: Uri.parse("asset:///assets/audio-example.mp3").toString(),
-                  //   songTitle: "Song Title",
+                  //   url: Uri.parse("asset:///assets/your_audio3.mp3").toString(),
+                  //   songName: "Song Title",
                   //   songArtist: "Song Artist",
                   // ),
                   mostRecentSong != null
                     ? AudioPlayerWidget(
                         url: Uri.parse(mostRecentSong!.sourceFilePath).toString(),
-                        songTitle: mostRecentSong!.songName,
+                        songName: mostRecentSong!.songName,
                         songArtist: mostRecentSong!.artistName,
                       )
                     : Text("No songs available. Import one from the playlist page ➡️"),

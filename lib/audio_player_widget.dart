@@ -9,7 +9,7 @@ class AudioPlayerWidget extends StatefulWidget {
   // final Color inactiveTrackColor;
   // final Color thumbColor;
   // final double iconSize;
-  final String songTitle;
+  final String songName;
   final String songArtist;
 
   AudioPlayerWidget({
@@ -19,7 +19,7 @@ class AudioPlayerWidget extends StatefulWidget {
     // required this.inactiveTrackColor,
     // required this.thumbColor,
     // required this.iconSize,
-    required this.songTitle,
+    required this.songName,
     required this.songArtist,
   });
 
@@ -32,44 +32,53 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   final audioPlayer = AudioPlayer();
   bool _isPlaying = false;
   bool _isLooping = false;
+  double _playbackRate = 1.0;
   Duration position = Duration.zero;
   Duration duration = Duration.zero;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
   @override
   void initState() {
     super.initState();
 
-    // Listen to states: playing, paused, stopped
+    // Listen to player state changes
     audioPlayer.playerStateStream.listen((playerState) {
-      setState(() {
-        _isPlaying = playerState == playerState.playing;
-        // totalDuration = audioPlayer.duration ?? Duration.zero;
-        // currentPosition = audioPlayer.position ?? Duration.zero;
-      });
+      if (playerState.playing != _isPlaying) {
+        setState(() {
+          _isPlaying = playerState.playing;
+        });
+      }
     });
 
     // Listen for duration changes
     audioPlayer.durationStream.listen((newDuration) {
-      // if (mounted) {
-        // Check the "mounted" property of this object before calling setState() to ensure the object is still in the tree
-        setState(() {
-          duration = newDuration ?? Duration.zero;
-        });
-      // }
+      setState(() {
+        duration = newDuration ?? Duration.zero;
+      });
     });
 
+    // Listen for position changes
     audioPlayer.positionStream.listen((newPosition) {
       setState(() {
           position = newPosition;
         });
     });
 
-    // Set initial loop mode
-    audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
+    // Handle audio completion
+    audioPlayer.playerStateStream.listen((playerState) {
+      if (playerState.processingState == ProcessingState.completed) {
+          setState(() {
+            audioPlayer.seek(Duration.zero);
+            audioPlayer.pause();
+          });
+      }
+    });
+    
+    // // Listen for playback rate changes
+    // audioPlayer.playbackRateStream.listen((newRate) { // It doesn't exist
+    //   setState(() {
+    //     _playbackRate = newRate;
+    //   });
+    // });
 
     // Set the audio source with the MediaItem tag
     audioPlayer.setAudioSource(
@@ -77,15 +86,19 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         Uri.parse(widget.url),
         tag: MediaItem(
           id: '1',  // Assign a unique ID for each media item
-          album: 'Album name',
-          title: widget.songTitle,
+          album: 'Album name', // TODO Replace with album name
+          title: widget.songName,
           artist: widget.songArtist,
-          artUri: Uri.parse('https://example.com/albumart.jpg'),  // Replace with your album art URL
+          artUri: Uri.parse('asset:///assets/images/music-icon.png'), // TODO Replace with album art URL
         ),
       ),
     );
+
+    // Set initial loop mode
+    // audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
   }
 
+  // Not disposing the audio player allows the music to be played in other pages too, but freezes the application
   @override
   void dispose() {
     audioPlayer.dispose();
@@ -93,30 +106,28 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   void _togglePlayback() {
-    if (_isPlaying) {
-       audioPlayer.pause();
-    } else {
-      //  audioPlayer.setUrl(widget.url);
-       audioPlayer.play();
-      //  setState(() {
-      //    _isPlaying = !_isPlaying;
-      //  });
-    }
+    setState(() {
+      if (_isPlaying) {
+        audioPlayer.pause();
+      } else {
+      //  audioPlayer.setUrl(widget.url); // Maybe it shouldn't be here
+        audioPlayer.play();
+      }
+      // _isPlaying = !_isPlaying;
+    });
+  }
 
-    if (mounted) {
-      setState(() {
-        _isPlaying = !_isPlaying;
-      });
-    }
+  void _toggleLooping() {
+    setState(() {
+      _isLooping = !_isLooping;
+      audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
+    });
   }
 
   // void _toggleLoopMode() {
   //   _isLooping = !_isLooping;
   //    audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
-
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
+  //   setState(() {});
   // }
 
   @override
@@ -127,11 +138,17 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             // Add other icons here when implementing previous/next song, loop and shuffle features
+            IconButton(
+              icon: Icon(
+                Icons.loop,
+                color: _isLooping ? const Color.fromARGB(255, 0, 0, 0) : Colors.grey,
+              ),
+              onPressed: _toggleLooping,
+            ),
             Container(
               width: 60,
               height: 60,
               alignment: Alignment.center,
-              // color: Theme.of(context).colorScheme.primary,
               // Rounded corners
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
@@ -140,13 +157,22 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                   borderRadius: BorderRadius.all(Radius.circular(100))),
               child: IconButton(
                 icon: Icon(
-                  _isPlaying ? Icons.pause : Icons.play_arrow_sharp,
+                  _isPlaying ? Icons.pause : Icons.play_arrow,
                   // color: widget.iconColor,
                   // size: widget.iconSize,
                   size: 42,
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
                 onPressed: _togglePlayback,
+              ),
+            ),
+            // Playback rate display
+            Text(
+              '${_playbackRate.toStringAsFixed(1)}x',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onBackground,
               ),
             ),
           ],
@@ -161,46 +187,44 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                   Expanded(
                     child: StreamBuilder<Duration?>(
                       stream: audioPlayer.positionStream,
-                      builder: (context, snapshot) {
-                        final duration = snapshot.data ?? Duration.zero;
-                        return Column(
-                          children: [
-                            Slider(
-                              value: duration.inSeconds.toDouble(),
-                              min: 0,
-                              max: (audioPlayer.duration?.inSeconds ?? 0).toDouble(),
-                              // activeColor: widget.activeTrackColor,
-                              // inactiveColor: widget.inactiveTrackColor,
-                              // thumbColor: widget.thumbColor,
-                              activeColor: Color(0xff000000),
-                              inactiveColor: Color(0xffe0e0e0),
-                              thumbColor: Color(0xff000000),
-                              onChanged: (value)  {
-                                 audioPlayer.seek(Duration(seconds: value.toInt()));
-                              },
-                            ),
-                            // SizedBox(height: 32),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      builder: (context, positionSnapshot) {
+                        final position = positionSnapshot.data ?? Duration.zero;
+
+                        return StreamBuilder<Duration?>(
+                          stream: audioPlayer.durationStream,
+                          builder: (context, durationSnapshot) {
+                            final duration = durationSnapshot.data ?? Duration.zero;
+
+                            return Column(
                               children: [
-                                // Thanks https://youtu.be/MB3YGQ-O1lk
-                                Text(formatTime(audioPlayer.position)),
-                                Text(
-                                  // '$widget.songTitle',
-                                  widget.songTitle,
+                                // TODO Add audio visualizer here (like: https://github.com/SerggioC/FlutterMusicPlayer/tree/master)
+                                Slider(
+                                  value: position.inSeconds.toDouble(),
+                                  min: 0,
+                                  max: duration.inSeconds.toDouble(),
+                                  activeColor: Color(0xff000000),
+                                  inactiveColor: Color(0xffe0e0e0),
+                                  thumbColor: Color(0xff000000),
+                                  onChanged: (value) {
+                                    audioPlayer.seek(Duration(seconds: value.toInt()));
+                                  },
                                 ),
-                                Text(
-                                  ' - ',
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(formatTime(position), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
+                                    SizedBox(width: 10),
+                                    Flexible(flex: 1, child: Text(widget.songName + ' - ' + widget.songArtist, overflow: TextOverflow.ellipsis)),
+                                    // Text(' - '),
+                                    // Text(widget.songArtist),
+                                    SizedBox(width: 5),
+                                    Text(formatTime(duration), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
+                                  ],
                                 ),
-                                Text(
-                                  // '$widget.songArtist',
-                                  widget.songArtist,
-                                ),
-                                Text(formatTime(duration)), // Or duration - position to get the remaining time of the song
+                                SizedBox(height: 10),
                               ],
-                            ),
-                            SizedBox(height: 5),
-                          ],
+                            );
+                          },
                         );
                       },
                     ),
@@ -215,6 +239,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     );
   }
 
+  // Thanks https://youtu.be/gJZWzi8BgBQ
   String formatTime(Duration duration) {
     final minutes = duration.inMinutes.toString().padLeft(2, '0');
     final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');

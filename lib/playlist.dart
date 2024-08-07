@@ -14,7 +14,7 @@ class _PlaylistState extends State<Playlist> {
   bool onlyCompatibleSongs = true;
   
   FilePickerResult? songResult; // ? operator means that NULL is allowed (see https://dart.dev/null-safety)
-  String _fileName = '';
+  // String _fileName = '';
 
   @override
   void initState() {
@@ -104,15 +104,18 @@ class _PlaylistState extends State<Playlist> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                Text(
-                  "BPM",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontStyle: FontStyle.normal,
-                    fontSize: 15,
-                    color: Color(0xff000000),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                  child: Text(
+                    "BPM",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontStyle: FontStyle.normal,
+                      fontSize: 15,
+                      color: Color(0xff000000),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -175,7 +178,7 @@ class _PlaylistState extends State<Playlist> {
         coverImage: AssetImage("assets/images/music-icon.png"), // Placeholder image
         sourceFilePath: path,
         songName: fileName,
-        artistName: "-", // Default or empty value
+        artistName: "/", // Default or empty value
         BPM: 0, // Default or empty value
       );
 
@@ -234,7 +237,7 @@ class _PlaylistState extends State<Playlist> {
             controller: bpmController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: 'Enter the BPM of the song (required)',
+              hintText: 'Enter song BPM (required)',
             ),
           ),
           actions: <Widget>[
@@ -243,7 +246,7 @@ class _PlaylistState extends State<Playlist> {
               onPressed: () {
                 final bpm = double.tryParse(bpmController.text) ?? 0;
 
-                // Prevent user from entering 0 BPM (or inserting a song by pressing OK without entering any value)
+                // Prevent user to put 0 BPM (or inserting a song by pressing OK without entering any value)
                 if (bpm == 0) {
                   Navigator.of(context).pop();
                 } else {
@@ -330,8 +333,7 @@ class _PlaylistState extends State<Playlist> {
                           color: Color(0x1f000000),
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.circular(10),
-                          border:
-                              Border.all(color: Color(0x4d9e9e9e), width: 0),
+                          border: Border.all(color: Color(0x4d9e9e9e), width: 0),
                         ),
                         child: ClipRRect(
                           // Make rounded corners in the album cover images
@@ -344,11 +346,11 @@ class _PlaylistState extends State<Playlist> {
                           ),
                         ),
                       ),
+                    SizedBox(width: 2), // Add some spacing between image and text
                       Expanded(
                         flex: 1,
                         child: Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -357,7 +359,7 @@ class _PlaylistState extends State<Playlist> {
                               Text(
                                 songs[index].songName,
                                 textAlign: TextAlign.start,
-                                overflow: TextOverflow.clip,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal,
@@ -368,7 +370,7 @@ class _PlaylistState extends State<Playlist> {
                               Text(
                                 songs[index].artistName,
                                 textAlign: TextAlign.start,
-                                overflow: TextOverflow.clip,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontStyle: FontStyle.normal,
@@ -399,7 +401,7 @@ class _PlaylistState extends State<Playlist> {
                 child: Text(
                   songs[index].BPM.toString(),
                   textAlign: TextAlign.center,
-                  overflow: TextOverflow.clip,
+                  // overflow: TextOverflow.clip,
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontStyle: FontStyle.normal,
