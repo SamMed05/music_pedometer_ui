@@ -1,241 +1,154 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:music_pedometer_ui/models/playlist_provider.dart';
+import 'package:provider/provider.dart';
+import 'models/playlist_provider.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
-  final String url;
-  // final Color iconColor;
-  // final Color activeTrackColor;
-  // final Color inactiveTrackColor;
-  // final Color thumbColor;
-  // final double iconSize;
-  final String songName;
-  final String songArtist;
-
-  AudioPlayerWidget({
-    required this.url,
-    // required this.iconColor,
-    // required this.activeTrackColor,
-    // required this.inactiveTrackColor,
-    // required this.thumbColor,
-    // required this.iconSize,
-    required this.songName,
-    required this.songArtist,
-  });
-
   @override
   _AudioPlayerWidgetState createState() => _AudioPlayerWidgetState();
 }
 
 class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
-  // AudioPlayer audioPlayer = AudioPlayer();
-  final audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
-  bool _isLooping = false;
-  double _playbackRate = 1.0;
-  Duration position = Duration.zero;
-  Duration duration = Duration.zero;
-
   @override
   void initState() {
     super.initState();
-
-    // Listen to player state changes
-    audioPlayer.playerStateStream.listen((playerState) {
-      if (playerState.playing != _isPlaying) {
-        setState(() {
-          _isPlaying = playerState.playing;
-        });
-      }
-    });
-
-    // Listen for duration changes
-    audioPlayer.durationStream.listen((newDuration) {
-      setState(() {
-        duration = newDuration ?? Duration.zero;
-      });
-    });
-
-    // Listen for position changes
-    audioPlayer.positionStream.listen((newPosition) {
-      setState(() {
-          position = newPosition;
-        });
-    });
-
-    // Handle audio completion
-    audioPlayer.playerStateStream.listen((playerState) {
-      if (playerState.processingState == ProcessingState.completed) {
-          setState(() {
-            audioPlayer.seek(Duration.zero);
-            audioPlayer.pause();
-          });
-      }
-    });
-    
-    // // Listen for playback rate changes
-    // audioPlayer.playbackRateStream.listen((newRate) { // It doesn't exist
-    //   setState(() {
-    //     _playbackRate = newRate;
-    //   });
-    // });
-
-    // Set the audio source with the MediaItem tag
-    audioPlayer.setAudioSource(
-      AudioSource.uri(
-        Uri.parse(widget.url),
-        tag: MediaItem(
-          id: '1',  // Assign a unique ID for each media item
-          album: 'Album name', // TODO Replace with album name
-          title: widget.songName,
-          artist: widget.songArtist,
-          artUri: Uri.parse('asset:///assets/images/music-icon.png'), // TODO Replace with album art URL
-        ),
-      ),
-    );
-
-    // Set initial loop mode
-    // audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
   }
-
-  // Not disposing the audio player allows the music to be played in other pages too, but freezes the application
-  @override
-  void dispose() {
-    audioPlayer.dispose();
-    super.dispose();
-  }
-
-  void _togglePlayback() {
-    setState(() {
-      if (_isPlaying) {
-        audioPlayer.pause();
-      } else {
-      //  audioPlayer.setUrl(widget.url); // Maybe it shouldn't be here
-        audioPlayer.play();
-      }
-      // _isPlaying = !_isPlaying;
-    });
-  }
-
-  void _toggleLooping() {
-    setState(() {
-      _isLooping = !_isLooping;
-      audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
-    });
-  }
-
-  // void _toggleLoopMode() {
-  //   _isLooping = !_isLooping;
-  //    audioPlayer.setLoopMode(_isLooping ? LoopMode.one : LoopMode.off);
-  //   setState(() {});
-  // }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Consumer<PlaylistProvider>(
+      builder: (context, playlistProvider, child) {
+        final audioPlayer = playlistProvider.audioPlayer;
+        final currentIndex = playlistProvider.currentSongIndex;
+        final currentSong = currentIndex != null && currentIndex < playlistProvider.playlist.length
+            ? playlistProvider.playlist[currentIndex]
+            : null;
+
+        return Column(
           children: [
-            // Add other icons here when implementing previous/next song, loop and shuffle features
-            IconButton(
-              icon: Icon(
-                Icons.loop,
-                color: _isLooping ? const Color.fromARGB(255, 0, 0, 0) : Colors.grey,
-              ),
-              onPressed: _toggleLooping,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // TODO Add other icons here when implementing previous/next song, loop and shuffle features
+                IconButton(
+                  icon: Icon(
+                    Icons.loop,
+                    color: playlistProvider.isLooping ? const Color.fromARGB(255, 0, 0, 0) : Colors.grey,
+                  ),
+                  onPressed: playlistProvider.toggleLooping,
+                ),
+                IconButton(
+                  onPressed: playlistProvider.playPreviousSong, 
+                  icon: Icon(Icons.skip_previous),
+                ),
+                Container(
+                  width: 60,
+                  height: 60,
+                  alignment: Alignment.center,
+                  // Rounded corners
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.primary, width: 0),
+                      borderRadius: BorderRadius.all(Radius.circular(100))),
+                  child: IconButton(
+                    icon: Icon(
+                      playlistProvider.isPlaying ? Icons.pause : Icons.play_arrow,
+                      size: 42,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                    onPressed: playlistProvider.pauseOrResume,
+                  ),
+                ),
+                IconButton(
+                  onPressed: playlistProvider.playNextSong, 
+                  icon: Icon(Icons.skip_next),
+                ),
+                // Playback rate display
+                Text(
+                  '${playlistProvider.playbackRate.toStringAsFixed(1)}x',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+                ),
+              ],
             ),
             Container(
-              width: 60,
-              height: 60,
-              alignment: Alignment.center,
-              // Rounded corners
-              decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  border: Border.all(
-                      color: Theme.of(context).colorScheme.primary, width: 0),
-                  borderRadius: BorderRadius.all(Radius.circular(100))),
-              child: IconButton(
-                icon: Icon(
-                  _isPlaying ? Icons.pause : Icons.play_arrow,
-                  // color: widget.iconColor,
-                  // size: widget.iconSize,
-                  size: 42,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-                onPressed: _togglePlayback,
-              ),
-            ),
-            // Playback rate display
-            Text(
-              '${_playbackRate.toStringAsFixed(1)}x',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onBackground,
+              // padding: EdgeInsets.all(5),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: StreamBuilder<Duration?>(
+                          stream: audioPlayer.positionStream,
+                          builder: (context, positionSnapshot) {
+                            final position = positionSnapshot.data ?? Duration.zero;
+        
+                            return StreamBuilder<Duration?>(
+                              stream: audioPlayer.durationStream,
+                              builder: (context, durationSnapshot) {
+                                final duration = durationSnapshot.data ?? Duration.zero;
+        
+                                return Column(
+                                  children: [
+                                    // TODO Add audio visualizer here (like: https://github.com/SerggioC/FlutterMusicPlayer/tree/master)
+                                    Slider(
+                                      value: position.inSeconds.toDouble(),
+                                      min: 0,
+                                      max: duration.inSeconds.toDouble(),
+                                      // TODO Fix colors for light/dark modes
+                                      activeColor: Color(0xff000000),
+                                      inactiveColor: Color(0xffe0e0e0),
+                                      thumbColor: Color(0xff000000),
+                                      onChanged: (value) {
+                                        // When the user is sliding
+                                        audioPlayer.seek(Duration(seconds: value.toInt()));
+                                      },
+                                      onChangeEnd: (double double) {
+                                        // Sliding has finished, go to that position in song duration
+                                        playlistProvider.seek(Duration(seconds: double.toInt()));
+                                      },
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(formatTime(position), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
+                                        SizedBox(width: 10),
+                                        // Display song name and artist name, if not null
+                                        Flexible(flex: 1,
+                                          child: Text(
+                                            currentSong != null
+                                                ? '${currentSong.songName} - ${currentSong.artistName}'
+                                                : 'No song playing',
+                                            overflow: TextOverflow.ellipsis,
+                                          ),),
+                                        SizedBox(width: 5),
+                                        Text(formatTime(duration), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      // TODO Add here the step count
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
-        ),
-        Container(
-          // padding: EdgeInsets.all(5),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: StreamBuilder<Duration?>(
-                      stream: audioPlayer.positionStream,
-                      builder: (context, positionSnapshot) {
-                        final position = positionSnapshot.data ?? Duration.zero;
-
-                        return StreamBuilder<Duration?>(
-                          stream: audioPlayer.durationStream,
-                          builder: (context, durationSnapshot) {
-                            final duration = durationSnapshot.data ?? Duration.zero;
-
-                            return Column(
-                              children: [
-                                // TODO Add audio visualizer here (like: https://github.com/SerggioC/FlutterMusicPlayer/tree/master)
-                                Slider(
-                                  value: position.inSeconds.toDouble(),
-                                  min: 0,
-                                  max: duration.inSeconds.toDouble(),
-                                  activeColor: Color(0xff000000),
-                                  inactiveColor: Color(0xffe0e0e0),
-                                  thumbColor: Color(0xff000000),
-                                  onChanged: (value) {
-                                    audioPlayer.seek(Duration(seconds: value.toInt()));
-                                  },
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(formatTime(position), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
-                                    SizedBox(width: 10),
-                                    Flexible(flex: 1, child: Text(widget.songName + ' - ' + widget.songArtist, overflow: TextOverflow.ellipsis)),
-                                    // Text(' - '),
-                                    // Text(widget.songArtist),
-                                    SizedBox(width: 5),
-                                    Text(formatTime(duration), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  // Add here the step count
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
+        );
+      }
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'audio_player_widget.dart';
-import 'models/song_model.dart';
+import 'models/playlist_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -8,34 +9,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  double playbackRate = 1;
-  
-  
-  // Get the most recently added song
-  late SongModel? mostRecentSong;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize the most recent song
-    mostRecentSong = SongModel.getMostRecentSong();
-  }
-
-  void _updateMostRecentSong() {
-    setState(() {
-      mostRecentSong = SongModel.getMostRecentSong();
-    });
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      // initialIndex: 0,
       length: 3,
       child: Scaffold(
+        // backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          // title: Text('TabBar'),
           toolbarHeight: 0, // Remove empty white space
           elevation: 4,
           bottom: TabBar(
@@ -77,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontWeight: FontWeight.w600,
                               fontStyle: FontStyle.normal,
                               fontSize: 23,
-                              color: Color(0xff000000),
+                              // color: Color(0xff000000),
                             ),
                           ),
                         ),
@@ -95,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontWeight: FontWeight.w300,
                               fontStyle: FontStyle.normal,
                               fontSize: 13,
-                              color: Color(0xff000000),
+                              // color: Color(0xff000000),
                             ),
                           ),
                         ),
@@ -128,20 +108,14 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Column(
-                children: [
-                  // AudioPlayerWidget(
-                  //   url: Uri.parse("asset:///assets/your_audio3.mp3").toString(),
-                  //   songName: "Song Title",
-                  //   songArtist: "Song Artist",
-                  // ),
-                  mostRecentSong != null
-                    ? AudioPlayerWidget(
-                        url: Uri.parse(mostRecentSong!.sourceFilePath).toString(),
-                        songName: mostRecentSong!.songName,
-                        songArtist: mostRecentSong!.artistName,
-                      )
-                    : Text("No songs available. Import one from the playlist page ➡️"),
-                ],
+                children: [Consumer<PlaylistProvider>(
+                builder: (context, playlistProvider, child) {
+                  final mostRecentSong = playlistProvider.getMostRecentSong();
+                  return mostRecentSong != null
+                      ? AudioPlayerWidget()
+                      : Text("No songs available. Import one from the playlist page ➡️");
+                }
+                ),],
               ),
             ),
           ],
@@ -154,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w600,
               fontStyle: FontStyle.normal,
               fontSize: 15,
-              color: Color(0xff000000),
+              // color: Color(0xff000000),
             ),
             textAlign: TextAlign.start,
           ),
@@ -164,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w300,
               fontStyle: FontStyle.normal,
               fontSize: 13,
-              color: Color(0xff000000),
+              // color: Color(0xff000000),
             ),
             textAlign: TextAlign.start,
           ),
@@ -174,12 +148,17 @@ class _HomeScreenState extends State<HomeScreen> {
           onChanged: (value) {},
           controlAffinity: ListTileControlAffinity.trailing,
           dense: true,
+          // tileColor: Theme.of(context).colorScheme.onSecondary,
           activeColor: Theme.of(context).colorScheme.onPrimary,
           activeTrackColor: Theme.of(context).colorScheme.primary,
           inactiveThumbColor: Theme.of(context).colorScheme.secondary,
           inactiveTrackColor: Theme.of(context).canvasColor,
           contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-          secondary: Icon(Icons.timer, color: Color(0xff000000), size: 24),
+          secondary: Icon(
+            Icons.timer,
+            // color: Color(0xff000000),
+            size: 24
+          ),
           selected: false,
           selectedTileColor: Color(0x42000000),
         ),

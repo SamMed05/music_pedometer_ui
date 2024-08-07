@@ -1,7 +1,7 @@
 name: music_pedometer_ui
-description: "A new Flutter project."
+description: "A Flutter mobile app that synchronizes music rhythm the the steps of the user."
 publish_to: 'none'
-version: 0.1.6
+version: 0.2.0
 
 environment:
   sdk: '>=3.4.4 <4.0.0'
@@ -17,6 +17,7 @@ dependencies:
   file_picker: ^5.3.1
   package_info_plus: ^8.0.1
   just_audio_background: ^0.0.1-beta.13
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

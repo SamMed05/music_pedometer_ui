@@ -34,7 +34,7 @@ class _CommonDrawerState extends State<CommonDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -64,7 +64,7 @@ class _CommonDrawerState extends State<CommonDrawer> {
                 children: [
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
-                    child: Text('This app helps to sync songs to match your steps tempo.'),
+                    child: Text('A mobile app to synchronize the rhythm of the music to your steps.'),
                   ),
                   GestureDetector(
                     onTap: () async {

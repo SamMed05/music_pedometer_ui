@@ -39,13 +39,14 @@ class _NavigationMenuState extends State<NavigationMenu> {
             controller.selectedIndex.value = index;
             _pageController.jumpToPage(index);
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(
                 icon: Padding(
                   padding: EdgeInsets.all(4.0),
                   child: Icon(
                     Icons.home_filled,
                     size: 29,
+                    // color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
                 label: "Home"),
@@ -55,6 +56,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
                   child: Icon(
                     Icons.format_list_bulleted_sharp,
                     size: 29,
+                    // color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
                 label: "Playlist"),
@@ -64,6 +66,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
                   child: Icon(
                     Icons.settings,
                     size: 29,
+                    // color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
                 label: "Options"),
