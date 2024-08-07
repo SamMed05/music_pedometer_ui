@@ -4,7 +4,6 @@ import 'navigation_controller.dart';
 import 'custom_app_bar.dart';
 import 'common_drawer.dart';
 
-// Thanks https://youtu.be/qdO1hwg2HY8
 class NavigationMenu extends StatefulWidget {
   @override
   _NavigationMenuState createState() => _NavigationMenuState();

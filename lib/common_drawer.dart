@@ -29,7 +29,7 @@ class CommonDrawer extends StatelessWidget {
               showAboutDialog(
                 context: context,
                 applicationName: 'Music Pedometer',
-                applicationVersion: '0.1.2',
+                applicationVersion: '0.1.3',
                 applicationLegalese: 'Developed by Samuel Mediani',
                 children: [
                   Padding(

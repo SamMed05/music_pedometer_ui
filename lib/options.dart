@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'custom_app_bar.dart';
-// import 'common_drawer.dart';
 
 // Global variables
 double maxPlaybackSpeed = 2.0;
