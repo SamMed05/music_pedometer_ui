@@ -169,43 +169,47 @@ class _PlaylistPage extends State<Playlist> {
 
   void pickFile() async {
     final songResult = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
+      allowMultiple: true, // Allow multiple file selection
       type: FileType.custom,
       allowedExtensions: ['mp3', 'wav', 'ogg', 'aac'], // https://developer.android.com/media/media3/exoplayer/supported-formats and https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/MultimediaPG/UsingAudio/UsingAudio.html
     );
     if (songResult != null) {
-      final path = songResult.files.single.path!;
-      final fileName = songResult.files.single.name;
+      // Iterate over each selected file
+      for (PlatformFile file in songResult.files) {
+        final path = file.path!;
+        final fileName = file.name;
 
-      // Create a new SongModel instance with default values
-      final newSong = SongModel(
-        isSelected: true,
-        songName: fileName,
-        artistName: "/", // Default or empty value
-        coverImage: Uri.parse("assets/images/music-icon.png").toString(), // Placeholder image
-        audioPath: path,
-        BPM: 0, // Default or empty value
-      );
-      
-      // Show dialog to enter BPM
-      bool isSongAdded = await _showBPMDialog(newSong);
-
-      if (isSongAdded) {
-        // Add the new song to the model only if the BPM is set
-        playlistProvider.addSong(newSong);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Imported song ' + fileName),
-            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
-            duration: const Duration(seconds: 2),
-          ),
+        // Create a new SongModel instance
+        final newSong = SongModel(
+          isSelected: true,
+          songName: fileName,
+          artistName: "/",
+          coverImage: Uri.parse("assets/images/music-icon.png").toString(),
+          audioPath: path,
+          BPM: 0,
         );
+
+        // Show dialog to enter BPM for each song
+        bool isSongAdded = await _showBPMDialog(newSong);
+
+        if (isSongAdded) {
+          playlistProvider.addSong(newSong);
+
+          // Show a SnackBar for each successfully imported song
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Imported song: $fileName'),
+              backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
       }
     } else {
+      // Show a SnackBar if no songs were selected
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('No song chosen'),
+          content: const Text('No songs chosen'),
           backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
           duration: const Duration(seconds: 2),
         ),
