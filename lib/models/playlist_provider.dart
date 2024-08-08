@@ -187,6 +187,21 @@ class PlaylistProvider extends ChangeNotifier {
     play(); // Play the song as soon as it's imported
   }
 
+  void removeSong(int index) {
+    _playlist.removeAt(index);
+    // Adjust current song index
+    if (_currentSongIndex != null && _currentSongIndex! >= index) {
+      _currentSongIndex = _currentSongIndex! - 1;
+      if (_currentSongIndex! < 0 && _playlist.isNotEmpty) {
+        _currentSongIndex = 0;
+      } else if (_playlist.isEmpty) {
+        _currentSongIndex = null;
+        pause();
+      }
+    }
+    notifyListeners();
+  }
+
   PlaylistProvider() {
     _audioPlayer.positionStream.listen((position) {
       _currentDuration = position;

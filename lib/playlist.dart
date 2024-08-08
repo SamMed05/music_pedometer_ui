@@ -344,6 +344,9 @@ class _PlaylistPage extends State<Playlist> {
                     // Play the song at the given index
                     goToSong(index);
                   },
+                  onLongPress: () { // Add onLongPress callback
+                    _showDeleteConfirmationDialog(index); // Show confirmation dialog
+                  },
                   child: Container(
                     margin: EdgeInsets.all(0),
                     padding: EdgeInsets.all(6),
@@ -500,4 +503,56 @@ class _PlaylistPage extends State<Playlist> {
       },
     );
   }
+
+  Future<void> _showDeleteConfirmationDialog(int songIndex) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User can't ignore this dialog!
+      builder: (BuildContext context) {
+        // Check if the playlist is empty or the index is invalid
+        if (playlistProvider.playlist.isEmpty || songIndex >= playlistProvider.playlist.length) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('No song to delete.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        } else {
+          return AlertDialog(
+            title: const Text('Delete Song'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text('Are you sure you want to delete "${playlistProvider.playlist[songIndex].songName}"?'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Delete'),
+                onPressed: () {
+                  // Remove the song from the playlist
+                  playlistProvider.removeSong(songIndex);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
 }
