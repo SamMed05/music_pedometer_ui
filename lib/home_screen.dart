@@ -102,15 +102,106 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
 
+                  // Steps tab
                   Center(
-                    // child: Text("Second tab"),
                     child: Consumer<StepDetectionProvider>(
                       builder: (context, stepDetectionProvider, child) {
-                        return Text("Step Count: ${stepDetectionProvider.stepCount}");
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Step Count
+                            Padding(
+                              padding: const EdgeInsets.only(top: 18.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center, // Center the row
+                                children: [
+                                  Text(
+                                    "${stepDetectionProvider.stepCount}",
+                                    style: TextStyle(
+                                      fontSize: 45.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Padding( // Column with alignment to end doesn't work
+                                    padding: EdgeInsets.fromLTRB(0, 18, 0, 0),
+                                    child:
+                                      Text(
+                                        "steps",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w300,
+                                          color: Theme.of(context).colorScheme.secondary,
+                                        ),
+                                      ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 30),
+                            // Step Frequency Chart
+                            SizedBox(
+                              height: 200, // Adjust height as needed
+                              child: LineChart(
+                                LineChartData(
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: stepDetectionProvider.stepFrequencyData, // Use step frequency data
+                                      color: Theme.of(context).colorScheme.secondary,
+                                    ),
+                                  ],
+                                  gridData: FlGridData(
+                                    show: false,
+                                    drawVerticalLine: true,
+                                    getDrawingHorizontalLine: (value) => FlLine(
+                                      color: Color.fromARGB(255, 146, 146, 146),
+                                      strokeWidth: 0.5,
+                                    ),
+                                    getDrawingVerticalLine: (value) => FlLine(
+                                      color: Color.fromARGB(255, 146, 146, 146),
+                                      strokeWidth: 0.5,
+                                    ),
+                                  ),
+                                  lineTouchData: LineTouchData(enabled: false),
+
+                                  titlesData: FlTitlesData(
+                                    show: true,
+                                    rightTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: false,
+                                      )
+                                    ),
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: false,
+                                      ),
+                                    ),
+                                    topTitles: AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                  ),
+                                  
+                                  borderData: FlBorderData(
+                                    show: true,
+                                    border: Border.all(
+                                      color: Color.fromARGB(0, 255, 255, 255),
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 30),
+                          ],
+                        );
                       },
                     ),
                   ),
 
+                  // Accelerometer tab
                   Center(
                     // child: Text("Third tab"),
                     child: Consumer<StepDetectionProvider>( // Access the StepDetectionProvider here
@@ -124,6 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   spots: stepDetectionProvider.accData,
                                   isCurved: true,
                                   color: Theme.of(context).colorScheme.primary,
+                                  barWidth: 2,
+                                  isStrokeCapRound: true,
                                   dotData: FlDotData(show: false),
                                   belowBarData: BarAreaData(
                                     show: true,
@@ -141,6 +234,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ],
+
+                              titlesData: FlTitlesData(
+                                show: true,
+                                rightTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true, // Show right titles
+                                    reservedSize: 40, // Reserve space for left titles
+                                  )
+                                ),
+                                leftTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true, // Show left titles
+                                    reservedSize: 40, // Reserve space for left titles
+                                  ),
+                                ),
+                                topTitles: AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false), // Hide top titles
+                                ),
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false), // Hide bottom titles
+                                ),
+                              ),
+                              // borderData: FlBorderData(show: false), // Hide chart border
+                              // gridData: FlGridData(show: true), // Show grid lines
+                              
                               borderData: FlBorderData(
                                 show: true,
                                 border: Border.all(

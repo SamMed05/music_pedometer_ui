@@ -40,6 +40,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 IconButton(
                   onPressed: playlistProvider.playPreviousSong, 
                   icon: Icon(Icons.skip_previous),
+                  iconSize: 35,
                 ),
                 Container(
                   width: 60,
@@ -63,6 +64,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 IconButton(
                   onPressed: playlistProvider.playNextSong, 
                   icon: Icon(Icons.skip_next),
+                  iconSize: 35,
                 ),
                 // Playback rate display
                 Text(
