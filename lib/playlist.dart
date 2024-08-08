@@ -297,7 +297,10 @@ class _PlaylistPage extends State<Playlist> {
                   value: playlistProvider.playlist[index].isSelected,
                   onChanged: (value) {
                     setState(() {
-                      isChecked = value!;
+                      // isChecked = value!;
+                      // Update the isSelected property in the SongModel
+                      playlistProvider.playlist[index].isSelected = value!;
+                      playlistProvider.notifyListeners(); // Notify listeners of the change
                     });
                   },
                   activeColor: Color.fromARGB(255, 145, 145, 145),

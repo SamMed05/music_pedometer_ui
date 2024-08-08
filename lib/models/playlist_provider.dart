@@ -136,11 +136,14 @@ class PlaylistProvider extends ChangeNotifier {
 
   void playNextSong() {
     if (_currentSongIndex != null) {
-      if (_currentSongIndex! < _playlist.length - 1) {
-        _currentSongIndex = _currentSongIndex! + 1;
-      } else {
-        _currentSongIndex = 0;
-      }
+      do { // Use a do-while loop to find the next selected song
+        if (_currentSongIndex! < _playlist.length - 1) {
+          _currentSongIndex = _currentSongIndex! + 1;
+        } else {
+          _currentSongIndex = 0;
+        }
+      } while (!_playlist[_currentSongIndex!].isSelected); // Loop until a selected song is found
+
       play();
     }
   }
@@ -150,11 +153,14 @@ class PlaylistProvider extends ChangeNotifier {
       seek(Duration.zero);
     } else {
       if (_currentSongIndex != null) {
-        if (_currentSongIndex! > 0) {
-          _currentSongIndex = _currentSongIndex! - 1;
-        } else {
-          _currentSongIndex = _playlist.length - 1;
-        }
+        do { // Use a do-while loop to find the previous selected song
+          if (_currentSongIndex! > 0) {
+            _currentSongIndex = _currentSongIndex! - 1;
+          } else {
+            _currentSongIndex = _playlist.length - 1;
+          }
+        } while (!_playlist[_currentSongIndex!].isSelected); // Loop until a selected song is found
+
         play();
       }
     }
