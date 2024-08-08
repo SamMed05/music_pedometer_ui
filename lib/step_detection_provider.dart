@@ -106,7 +106,7 @@ class StepDetectionProvider with ChangeNotifier {
     // Add new accelerometer data to the list
     _accData.add(FlSpot(DateTime.now().millisecondsSinceEpoch.toDouble(), magnitude));
 
-    // Keep only the latest 100 data points
+    // Keep only the latest data points
     if (_accData.length > _windowSize) {
       _accData.removeAt(0);
     }
@@ -122,6 +122,7 @@ class StepDetectionProvider with ChangeNotifier {
     _stepFrequencyData.add(FlSpot(DateTime.now().millisecondsSinceEpoch.toDouble(), stepFrequency));
     // _stepFrequencyData.add(FlSpot(normalizedTimestamp, stepFrequency));
 
+    // if (_stepFrequencyData.isEmpty) return; // Handle empty list
     // Keep only the latest data points
     if (_stepFrequencyData.length > 100) { // TODO Increasing this value makes the app crash because of an error in fl_chart rendering ('input >= 1.0': is not true)
       _stepFrequencyData.removeAt(0);

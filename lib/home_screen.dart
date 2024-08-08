@@ -138,10 +138,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(height: 30),
+                            // Display Current SPM
+                            SizedBox(height: 5),
+                            Text(
+                              "You are walking at ${stepDetectionProvider.currentSPM.toStringAsFixed(0)} SPM", // Display SPM with 0 decimal places
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            SizedBox(height: 20),
                             // Step Frequency Chart
                             SizedBox(
-                              height: 200, // Adjust height as needed
+                              height: 200, // Set a fixed height
                               child: LineChart(
                                 LineChartData(
                                   lineBarsData: [
