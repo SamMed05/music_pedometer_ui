@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'song_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert'; // Import for jsonEncode and jsonDecode
 
 // Thanks https://youtu.be/Zr4j6W7nmpg
 class PlaylistProvider extends ChangeNotifier {
@@ -185,6 +187,8 @@ class PlaylistProvider extends ChangeNotifier {
     notifyListeners();
 
     play(); // Play the song as soon as it's imported
+
+    _savePlaylistToStorage(); // Save the updated playlist
   }
 
   void removeSong(int index) {
@@ -200,6 +204,8 @@ class PlaylistProvider extends ChangeNotifier {
       }
     }
     notifyListeners();
+
+    _savePlaylistToStorage(); // Save the updated playlist
   }
 
   PlaylistProvider() {
@@ -222,5 +228,33 @@ class PlaylistProvider extends ChangeNotifier {
         playNextSong();
       }
     });
+    
+    _loadPlaylistFromStorage(); // Load playlist data on initialization
+  }
+
+  Future<void> _loadPlaylistFromStorage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Load playlist data (based on SongModel structure)
+    String? playlistJson = prefs.getString('playlist');
+
+    if (playlistJson != null && playlistJson.isNotEmpty) {
+      // Deserialize playlist data from JSON
+      print("JSON String: $playlistJson");
+      List<dynamic> decodedPlaylist = jsonDecode(playlistJson);
+      _playlist.clear(); // Clear the current playlist
+      for (var songData in decodedPlaylist) {
+        _playlist.add(SongModel.fromJson(songData));
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<void> _savePlaylistToStorage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Serialize playlist data to JSON
+    List<Map<String, dynamic>> playlistData = _playlist.map((song) => song.toJson()).toList();
+    String playlistJson = jsonEncode(playlistData);
+    await prefs.setString('playlist', playlistJson);
   }
 }

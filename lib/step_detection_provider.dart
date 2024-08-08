@@ -4,6 +4,7 @@ import 'models/playlist_provider.dart';
 import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StepDetectionProvider with ChangeNotifier {
   final PlaylistProvider _playlistProvider;
@@ -48,12 +49,16 @@ class StepDetectionProvider with ChangeNotifier {
       _threshold = 6;
     }
     notifyListeners();
+
+    _saveSettingsToStorage(); // Save the updated setting
   }
 
   RangeValues get compatibleBPMRange => _compatibleBPMRange;
   set compatibleBPMRange(RangeValues values) {
     _compatibleBPMRange = values;
     notifyListeners();
+
+    _saveSettingsToStorage(); // Save the updated setting
   }
 
   // Getter for the current SPM (Steps Per Minute) of the user
@@ -67,11 +72,13 @@ class StepDetectionProvider with ChangeNotifier {
   }
 
 
-  // Listen to accelerometer data
+  // Listen to accelerometer data (constructor)
   StepDetectionProvider(this._playlistProvider) {
     _accelerometerSubscription = accelerometerEventStream().listen((AccelerometerEvent event) {
       _detectStep(event);
     });
+    
+    _loadSettingsFromStorage(); // Load settings on initialization
   }
 
   void _detectStep(AccelerometerEvent event) {
@@ -179,5 +186,35 @@ class StepDetectionProvider with ChangeNotifier {
   void dispose() {
     _accelerometerSubscription?.cancel();
     super.dispose();
+  }
+
+  Future<void> _loadSettingsFromStorage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isRunningMode = prefs.getBool('isRunningMode') ?? false;
+
+    // Update bufferMilliseconds and threshold based on loaded isRunningMode
+    if (_isRunningMode) {
+      _bufferMilliseconds = 300;
+      _threshold = 10;
+    } else {
+      _bufferMilliseconds = 400;
+      _threshold = 7;
+    }
+
+    _compatibleBPMRange = RangeValues(
+      prefs.getDouble('minBPM') ?? 110,
+      prefs.getDouble('maxBPM') ?? 150,
+    );
+    // ...
+
+    notifyListeners(); // Notify listeners about loaded settings
+  }
+
+  Future<void> _saveSettingsToStorage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isRunningMode', _isRunningMode);
+    prefs.setDouble('minBPM', _compatibleBPMRange.start);
+    prefs.setDouble('maxBPM', _compatibleBPMRange.end);
+    // ...
   }
 }
