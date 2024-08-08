@@ -23,6 +23,7 @@ class StepDetectionProvider with ChangeNotifier {
   DateTime _startTime = DateTime.now(); // Used to calculate the elapsed time for step frequency calculation
   List<FlSpot> _stepFrequencyData = []; // List to store step frequency data points
   
+  RangeValues _compatibleBPMRange = RangeValues(80, 140); // Default range
 
   // Getters and setters
   int get stepCount => _stepCount;
@@ -47,6 +48,22 @@ class StepDetectionProvider with ChangeNotifier {
       _threshold = 6;
     }
     notifyListeners();
+  }
+
+  RangeValues get compatibleBPMRange => _compatibleBPMRange;
+  set compatibleBPMRange(RangeValues values) {
+    _compatibleBPMRange = values;
+    notifyListeners();
+  }
+
+  // Getter for the current SPM (Steps Per Minute) of the user
+  double get currentSPM {
+    if (_stepInterval > 0) {
+      double stepFrequency = 1 / _stepInterval;
+      return stepFrequency * 60;
+    } else {
+      return 0.0; // Return 0 if no steps have been detected yet
+    }
   }
 
 

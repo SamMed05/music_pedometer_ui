@@ -19,6 +19,7 @@ class _OptionsState extends State<Options> {
   // bool _isRunningMode = false;
 
   // RangeValues _playbackRateRange = RangeValues(minPlaybackRate, maxPlaybackRate);
+  RangeValues _compatibleBPMRange = RangeValues(80, 140); // Default compatible BPM range
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +144,53 @@ class _OptionsState extends State<Options> {
             inactiveThumbColor: Theme.of(context).colorScheme.secondary,
             inactiveTrackColor: Theme.of(context).canvasColor,
             // ...
+          ),
+
+          // Compatible BPM Range Slider
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Allow songs in this BPM range",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("40", style: TextStyle(fontWeight: FontWeight.w600)),
+                    Container(
+                      width: 780 / MediaQuery.of(context).devicePixelRatio,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: RangeSlider(
+                          values: _compatibleBPMRange,
+                          min: 40,
+                          max: 200,
+                          divisions: 160,
+                          labels: RangeLabels(
+                            _compatibleBPMRange.start.round().toString(),
+                            _compatibleBPMRange.end.round().toString(),
+                          ),
+                          onChanged: (RangeValues values) {
+                            setState(() {
+                              _compatibleBPMRange = values;
+                              // Update the StepDetectionProvider's compatible BPM range
+                              Provider.of<StepDetectionProvider>(context, listen: false).compatibleBPMRange = values;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    Text("200", style: TextStyle(fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

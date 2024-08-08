@@ -3,6 +3,7 @@ import 'models/song_model.dart';
 import 'package:file_picker/file_picker.dart';
 import 'models/playlist_provider.dart';
 import 'package:provider/provider.dart';
+import 'step_detection_provider.dart';
 
 class Playlist extends StatefulWidget {
   const Playlist({super.key});
@@ -14,6 +15,7 @@ class Playlist extends StatefulWidget {
 class _PlaylistPage extends State<Playlist> {
   // Get playlist provider
   late final dynamic playlistProvider;
+  bool _onlyCompatibleSongs = false; // Initially false
 
   bool onlyCompatibleSongs = true;
   
@@ -58,7 +60,13 @@ class _PlaylistPage extends State<Playlist> {
             mainAxisSize: MainAxisSize.max,
             children: [
               SwitchListTile(
-                value: false,
+                value: _onlyCompatibleSongs,
+                onChanged: (value) {
+                  setState(() {
+                    _onlyCompatibleSongs = value;
+                    _updateSongSelection(); // Update song selections based on the switch state
+                  });
+                },
                 title: Text(
                   "Only compatible songs",
                   style: TextStyle(
@@ -70,7 +78,7 @@ class _PlaylistPage extends State<Playlist> {
                   textAlign: TextAlign.start,
                 ),
                 subtitle: Text(
-                  "Recommend songs that are in your current SPM range",
+                  "Recommend songs that are in your BPM range (edit in Options)",
                   style: TextStyle(
                     fontWeight: FontWeight.w300,
                     fontStyle: FontStyle.normal,
@@ -82,7 +90,6 @@ class _PlaylistPage extends State<Playlist> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.zero,
                 ),
-                onChanged: (value) {},
                 tileColor: Theme.of(context).colorScheme.onSecondary,
                 activeColor: Theme.of(context).colorScheme.onPrimary,
                 activeTrackColor: Theme.of(context).colorScheme.primary,
@@ -274,6 +281,26 @@ class _PlaylistPage extends State<Playlist> {
     );
 
     return isSongAdded;
+  }
+
+  void _updateSongSelection() {
+    if (_onlyCompatibleSongs) {
+      // Get the user's current SPM
+      // double userSPM = Provider.of<StepDetectionProvider>(context, listen: false).currentSPM;
+      RangeValues bpmRange = Provider.of<StepDetectionProvider>(context, listen: false).compatibleBPMRange;
+
+      // Iterate through the playlist and update isSelected based on BPM compatibility
+      for (SongModel song in playlistProvider.playlist) {
+        song.isSelected = song.BPM >= bpmRange.start && song.BPM <= bpmRange.end;
+      }
+    } else {
+      // Select all songs if the switch is off
+      for (SongModel song in playlistProvider.playlist) {
+        song.isSelected = true;
+      }
+    }
+
+    playlistProvider.notifyListeners(); // Notify listeners to rebuild the UI
   }
 
 
