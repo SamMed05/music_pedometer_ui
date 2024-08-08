@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+// import 'package:just_audio/just_audio.dart';
+// import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_pedometer_ui/models/playlist_provider.dart';
 import 'package:provider/provider.dart';
-import 'models/playlist_provider.dart';
+// import 'models/playlist_provider.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   @override
@@ -69,7 +69,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 ),
                 // Playback rate display
                 Text(
-                  '${playlistProvider.playbackRate.toStringAsFixed(1)}x',
+                  // '${playlistProvider.playbackRate.toStringAsFixed(1)}x',
+                  '${playlistProvider.playbackRate.toStringAsFixed(2)}x',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

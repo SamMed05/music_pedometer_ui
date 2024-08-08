@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'audio_player_widget.dart';
 import 'models/playlist_provider.dart';
 import 'package:provider/provider.dart';
+// import 'package:sensors_plus/sensors_plus.dart';
+import 'step_detection_provider.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -96,12 +99,75 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
+
                   Center(
-                    child: Text("Second tab"),
+                    // child: Text("Second tab"),
+                    child: Consumer<StepDetectionProvider>(
+                      builder: (context, stepDetectionProvider, child) {
+                        return Text("Step Count: ${stepDetectionProvider.stepCount}");
+                      },
+                    ),
                   ),
+
                   Center(
-                    child: Text("Third tab"),
+                    // child: Text("Third tab"),
+                    child: Consumer<StepDetectionProvider>( // Access the StepDetectionProvider here
+                      builder: (context, stepDetectionProvider, child) {
+                        return SizedBox( // Use SizedBox to constrain the chart's size
+                          height: 300,
+                          child: LineChart(
+                            LineChartData(
+                              lineBarsData: [
+                                LineChartBarData(
+                                  spots: stepDetectionProvider.accData,
+                                  isCurved: true,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  dotData: FlDotData(show: false),
+                                  belowBarData: BarAreaData(
+                                    show: true,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                                        Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                        Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                        Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              borderData: FlBorderData(
+                                show: true,
+                                border: Border.all(
+                                  color: Color.fromARGB(0, 255, 255, 255),
+                                  width: 2,
+                                ),
+                              ),
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: true,
+                                getDrawingHorizontalLine: (value) => FlLine(
+                                  color: Color.fromARGB(255, 146, 146, 146),
+                                  strokeWidth: 0.5,
+                                ),
+                                getDrawingVerticalLine: (value) => FlLine(
+                                  color: Color.fromARGB(255, 146, 146, 146),
+                                  strokeWidth: 0.5,
+                                ),
+                              ),
+                              lineTouchData: LineTouchData(enabled: false),
+                              minY: -15, // Fix Y-axis minimum value
+                              maxY: 15,  // Fix Y-axis maximum value
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
+
                 ],
               ),
             ),

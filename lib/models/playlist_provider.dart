@@ -48,6 +48,13 @@ class PlaylistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  
+  set playbackRate(double newRate) {
+    _playbackRate = newRate;
+    notifyListeners();
+  }
+  
+
   void play() async {
     if (_currentSongIndex != null) {
       final song = _playlist[_currentSongIndex!];

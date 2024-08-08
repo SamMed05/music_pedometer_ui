@@ -45,10 +45,10 @@ class _PlaylistPage extends State<Playlist> {
         final playlist = playlistProvider.playlist;
 
         // Get current song index
-        final currentSongIndex = playlistProvider.currentSongIndex;
+        // final currentSongIndex = playlistProvider.currentSongIndex;
 
         // Get current song
-        final currentSong = currentSongIndex != null ? playlist[currentSongIndex] : null;
+        // final currentSong = currentSongIndex != null ? playlist[currentSongIndex] : null;
 
         // Return scaffold UI
         return Scaffold(

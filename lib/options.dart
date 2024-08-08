@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_pedometer_ui/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'step_detection_provider.dart';
 
 // Global variables, move them in another file or put at the top of main
 double maxPlaybackSpeed = 2.0;
@@ -91,6 +92,32 @@ class _OptionsState extends State<Options> {
               ],
             ),
           ),
+
+          // Slider for adjusting the buffer
+          Slider(
+            value: Provider.of<StepDetectionProvider>(context).bufferMilliseconds,
+            min: 100,
+            max: 1000,
+            divisions: 9,
+            label: Provider.of<StepDetectionProvider>(context).bufferMilliseconds.round().toString(),
+            onChanged: (value) {
+              Provider.of<StepDetectionProvider>(context, listen: false).bufferMilliseconds = value;
+            },
+          ),
+          Text('Buffer: ${Provider.of<StepDetectionProvider>(context).bufferMilliseconds.round()} ms'),
+
+          // Slider for adjusting the threshold
+          Slider(
+            value: Provider.of<StepDetectionProvider>(context).threshold,
+            min: 5,
+            max: 20,
+            divisions: 15,
+            label: Provider.of<StepDetectionProvider>(context).threshold.toString(),
+            onChanged: (value) {
+              Provider.of<StepDetectionProvider>(context, listen: false).threshold = value;
+            },
+          ),
+          Text('Threshold: ${Provider.of<StepDetectionProvider>(context).threshold}'),
         ],
       ),
     );
