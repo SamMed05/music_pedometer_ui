@@ -23,9 +23,14 @@ class PlaylistProvider extends ChangeNotifier {
   bool _isPlaying = false;
   bool _isLooping = false;
   double _playbackRate = 1.0;
+  double _minPlaybackRate = 0.5;
+  double _maxPlaybackRate = 2.0;
   Duration _currentDuration = Duration.zero;
   Duration _totalDuration = Duration.zero;
   int? _currentSongIndex;
+
+  RangeValues _playbackRateRange = RangeValues(0.5, 2.0); // Default values for speed range
+
 
   // Getters
   List<SongModel> get playlist => _playlist;
@@ -39,7 +44,28 @@ class PlaylistProvider extends ChangeNotifier {
   // Getter to expose the AudioPlayer instance
   AudioPlayer get audioPlayer => _audioPlayer;
 
-  // Setters and methods
+  // Getters and setters for minPlaybackRate and maxPlaybackRate
+  double get minPlaybackRate => _minPlaybackRate;
+  set minPlaybackRate(double value) {
+    _minPlaybackRate = value;
+    notifyListeners();
+  }
+  double get maxPlaybackRate => _maxPlaybackRate;
+  set maxPlaybackRate(double value) {
+    _maxPlaybackRate = value;
+    notifyListeners();
+  }
+
+  // Getter and Setter for playbackRateRange
+  RangeValues get playbackRateRange => _playbackRateRange;
+  set playbackRateRange(RangeValues values) {
+    _playbackRateRange = values;
+    _minPlaybackRate = values.start; // Update minPlaybackRate
+    _maxPlaybackRate = values.end;   // Update maxPlaybackRate
+    notifyListeners();
+  }
+
+  // Other setters and methods
   set currentSongIndex(int? newIndex) {
     _currentSongIndex = newIndex;
     if (newIndex != null) {
@@ -47,13 +73,18 @@ class PlaylistProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
   
   set playbackRate(double newRate) {
     _playbackRate = newRate;
     notifyListeners();
   }
-  
+
+  // Reset playback rate to 1x whenActivate sync switch is disabled
+  void resetPlaybackRate() {
+    _playbackRate = 1.0;
+    _audioPlayer.setSpeed(_playbackRate); // Update the audio player
+    notifyListeners(); // Notify listeners about the change
+  }
 
   void play() async {
     if (_currentSongIndex != null) {

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:music_pedometer_ui/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'step_detection_provider.dart';
+import 'models/playlist_provider.dart';
 
-// Global variables, move them in another file or put at the top of main
-double maxPlaybackSpeed = 2.0;
-double minPlaybackSpeed = 0.5;
+// Global variables
+// double maxPlaybackRate = 2.0;
+// double minPlaybackRate = 0.5;
 
 
 class Options extends StatefulWidget {
@@ -15,8 +16,9 @@ class Options extends StatefulWidget {
 
 class _OptionsState extends State<Options> {
   // bool _darkTheme = false;
+  // bool _isRunningMode = false;
 
-  RangeValues _playbackSpeedRange = RangeValues(minPlaybackSpeed, maxPlaybackSpeed);
+  // RangeValues _playbackRateRange = RangeValues(minPlaybackRate, maxPlaybackRate);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,7 @@ class _OptionsState extends State<Options> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Adjust range of playback speed rate changes",
+                  "Adjust range of playback rate changes",
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 16,
@@ -66,19 +68,25 @@ class _OptionsState extends State<Options> {
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: RangeSlider(
-                          values: _playbackSpeedRange,
+                          // values: _playbackRateRange,
+                          values: Provider.of<PlaylistProvider>(context).playbackRateRange, // Access from provider
                           min: 0.5,
                           max: 2.0,
                           divisions: 15,
                           labels: RangeLabels(
-                            _playbackSpeedRange.start.toStringAsFixed(1),
-                            _playbackSpeedRange.end.toStringAsFixed(1),
+                            // _playbackRateRange.start.toStringAsFixed(1),
+                            // _playbackRateRange.end.toStringAsFixed(1),
+                            Provider.of<PlaylistProvider>(context).playbackRateRange.start.toStringAsFixed(1),
+                            Provider.of<PlaylistProvider>(context).playbackRateRange.end.toStringAsFixed(1),
                           ),
                           onChanged: (RangeValues values) {
                             setState(() {
-                              _playbackSpeedRange = values;
-                              minPlaybackSpeed = values.start;
-                              maxPlaybackSpeed = values.end;
+                              // _playbackRateRange = values;
+
+                              // Update the PlaylistProvider's playback rate range (see step 4)
+                              // Provider.of<PlaylistProvider>(context, listen: false).minPlaybackRate = values.start;
+                              // Provider.of<PlaylistProvider>(context, listen: false).maxPlaybackRate = values.end;
+                              Provider.of<PlaylistProvider>(context, listen: false).playbackRateRange = values;
                             });
                           },
                           // activeColor: Colors.black,
@@ -118,6 +126,24 @@ class _OptionsState extends State<Options> {
             },
           ),
           Text('Threshold: ${Provider.of<StepDetectionProvider>(context).threshold}'),
+
+          SwitchListTile(
+            // value: _isRunningMode, // Doing it in this waymakes it always reset to false when changing page
+            value: Provider.of<StepDetectionProvider>(context).isRunningMode, // Access from provider to prevent resetting
+            title: Text("Running Mode"),
+            onChanged: (value) {
+              setState(() {
+                // _isRunningMode = value;
+                // Update the StepDetectionProvider's running mode state (see step 5)
+                Provider.of<StepDetectionProvider>(context, listen: false).isRunningMode = value;
+              });
+            },
+            activeColor: Theme.of(context).colorScheme.onPrimary,
+            activeTrackColor: Theme.of(context).colorScheme.primary,
+            inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+            inactiveTrackColor: Theme.of(context).canvasColor,
+            // ...
+          ),
         ],
       ),
     );

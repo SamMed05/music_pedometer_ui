@@ -12,6 +12,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isSyncActive = true; // Track whether sync is active
+  
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -195,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         bottomNavigationBar: SwitchListTile(
-          value: true,
+          value: _isSyncActive,
           title: Text(
             "Activate Sync",
             style: TextStyle(
@@ -219,7 +221,13 @@ class _HomeScreenState extends State<HomeScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.zero,
           ),
-          onChanged: (value) {},
+          onChanged: (value) {
+            setState(() {
+              _isSyncActive = value;
+              // Update the StepDetectionProvider's sync state
+              Provider.of<StepDetectionProvider>(context, listen: false).isSyncActive = value;
+            });
+          },
           controlAffinity: ListTileControlAffinity.trailing,
           dense: true,
           // tileColor: Theme.of(context).colorScheme.onSecondary,

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-// import 'package:just_audio/just_audio.dart';
-// import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_pedometer_ui/models/playlist_provider.dart';
 import 'package:provider/provider.dart';
-// import 'models/playlist_provider.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   @override
@@ -31,7 +28,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // TODO Add other icons here when implementing previous/next song, loop and shuffle features
+                // TODO Add shuffle
                 IconButton(
                   icon: Icon(
                     Icons.loop,

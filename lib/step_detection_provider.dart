@@ -14,19 +14,43 @@ class StepDetectionProvider with ChangeNotifier {
   double _threshold = 7; // Threshold for step detection (Lower = more sensitive)
   DateTime? _lastStepTime;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
-  
+  bool _isRunningMode = false;
+  bool _isSyncActive = true; // Track whether sync is active
   List<FlSpot> _accData = []; // List to store accelerometer data points
   
-  // Getter for accData
+
+  // Getters and setters
+  int get stepCount => _stepCount;
+
   List<FlSpot> get accData => _accData;
 
+  bool get isSyncActive => _isSyncActive;
+  set isSyncActive(bool value) {
+    _isSyncActive = value;
+    notifyListeners();
+  }
+
+  bool get isRunningMode => _isRunningMode;
+  set isRunningMode(bool value) {
+    _isRunningMode = value;
+    // Adjust step detection parameters based on running mode (see below)
+    if (_isRunningMode) {
+      _bufferMilliseconds = 300; // Example values for running mode
+      _threshold = 9;
+    } else {
+      _bufferMilliseconds = 400; // Example values for normal mode
+      _threshold = 7;
+    }
+    notifyListeners();
+  }
+
+
+  // Listen to accelerometer data
   StepDetectionProvider(this._playlistProvider) {
     _accelerometerSubscription = accelerometerEventStream().listen((AccelerometerEvent event) {
       _detectStep(event);
     });
   }
-
-  int get stepCount => _stepCount;
 
   void _detectStep(AccelerometerEvent event) {
     double threshold = 10; // You might need to adjust this value
@@ -50,16 +74,6 @@ class StepDetectionProvider with ChangeNotifier {
       } else if (_lastStepTime == null) {
         _lastStepTime = now;
       }
-
-      // // Add new accelerometer data to the list
-      // _accData.add(FlSpot(DateTime.now().millisecondsSinceEpoch.toDouble(), event.y));
-
-      // // Keep only the latest 100 data points
-      // if (_accData.length > 100) {
-      //   _accData.removeAt(0);
-      // }
-
-      // notifyListeners(); // Notify listeners about the change in accData
     }
 
     // Add new accelerometer data to the list
@@ -74,27 +88,33 @@ class StepDetectionProvider with ChangeNotifier {
   }
 
   void _syncMusicToSteps() {
-    if (_stepInterval > 0) {
+    if (_stepInterval > 0  && _isSyncActive) { // Sync music only if sync switch is active
       double _stepFrequency = 1 / _stepInterval;
       double _userSPM = _stepFrequency * 60;
 
-      // // Get the current song's BPM from the playlist provider
-      // double? _originalBPM = _playlistProvider.playlist[_playlistProvider.currentSongIndex!].BPM;
-
       // Check if a song is loaded and playing
       if (_playlistProvider.currentSongIndex != null && _playlistProvider.isPlaying) {
+        // Get the current song's BPM from the playlist provider
         double? _originalBPM = _playlistProvider.playlist[_playlistProvider.currentSongIndex!].BPM;
 
-        // if (_originalBPM != null) {
-          double _playbackRate = _userSPM / _originalBPM; // Calculate playback rate
-          double _clampedPlaybackRate = _playbackRate.clamp(0.5, 2.0);
+        double _playbackRate = _userSPM / _originalBPM; // Calculate playback rate for sync
 
-          // Update the playback rate in the playlist provider
-          _playlistProvider.playbackRate = _clampedPlaybackRate;
-          _playlistProvider.audioPlayer.setSpeed(_clampedPlaybackRate);
-        // }
+        // Clamp the playback rate using minPlaybackRate and maxPlaybackRate
+        double clampedPlaybackRate = _playbackRate.clamp(
+          _playlistProvider.minPlaybackRate,
+          _playlistProvider.maxPlaybackRate,
+        );
+
+        // Update the playback rate in the playlist provider
+        _playlistProvider.playbackRate = clampedPlaybackRate;
+        _playlistProvider.audioPlayer.setSpeed(clampedPlaybackRate);
       }
       notifyListeners(); // Without this it starts changing playback rate only after changing tabs
+    }
+    if (!_isSyncActive) {
+      // _playlistProvider.audioPlayer.setSpeed(1);
+      _playlistProvider.resetPlaybackRate(); // Due to the nature of the _syncMusicToSteps function, the playback rate is only reset to 1x at the detection of the first step after disabling the switch
+      notifyListeners();
     }
   }
 
