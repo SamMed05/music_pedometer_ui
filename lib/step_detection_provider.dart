@@ -26,6 +26,10 @@ class StepDetectionProvider with ChangeNotifier {
   
   RangeValues _compatibleBPMRange = RangeValues(80, 140); // Default range
 
+  double _targetPlaybackRate = 1.0; // Target playback rate for smoothing
+  Timer? _smoothPlaybackRateTimer;
+  double _smoothingFactor = 0.1; // Smaller = slower smoothing
+
   // Getters and setters
   int get stepCount => _stepCount;
   List<FlSpot> get accData => _accData;
@@ -69,6 +73,15 @@ class StepDetectionProvider with ChangeNotifier {
     } else {
       return 0.0; // Return 0 if no steps have been detected yet
     }
+  }
+
+  // Getter and setter for smoothingFactor
+  double get smoothingFactor => _smoothingFactor;
+  set smoothingFactor(double value) {
+    _smoothingFactor = value;
+    notifyListeners();
+
+    _saveSettingsToStorage(); // Save the updated setting
   }
 
 
@@ -123,7 +136,7 @@ class StepDetectionProvider with ChangeNotifier {
     double stepFrequency = _stepCount / (DateTime.now().difference(_startTime).inSeconds);
 
     // Calculate normalized timestamp (in seconds)
-    double normalizedTimestamp = DateTime.now().difference(_startTime).inSeconds.toDouble();
+    // double normalizedTimestamp = DateTime.now().difference(_startTime).inSeconds.toDouble();
 
     // Add new step frequency data to the list
     _stepFrequencyData.add(FlSpot(DateTime.now().millisecondsSinceEpoch.toDouble(), stepFrequency));
@@ -156,9 +169,32 @@ class StepDetectionProvider with ChangeNotifier {
           _playlistProvider.maxPlaybackRate,
         );
 
+        // Update the target playback rate for smoothing
+        _targetPlaybackRate = clampedPlaybackRate;
+
+        // Start or reset the smoothing timer
+        _smoothPlaybackRateTimer?.cancel();
+        _smoothPlaybackRateTimer = Timer.periodic(Duration(milliseconds: 50), (timer) {
+          // Calculate the difference between current and target playback rates
+          double difference = _targetPlaybackRate - _playlistProvider.playbackRate;
+
+          // Adjust the playback rate gradually
+          if (difference.abs() > 0.01) { 
+            _playlistProvider.playbackRate += difference * _smoothingFactor;
+            _playlistProvider.audioPlayer.setSpeed(_playlistProvider.playbackRate);
+            notifyListeners(); 
+          } else {
+            // Stop the timer when the target is reached
+            _playlistProvider.playbackRate = _targetPlaybackRate;
+            _playlistProvider.audioPlayer.setSpeed(_playlistProvider.playbackRate);
+            notifyListeners();
+            _smoothPlaybackRateTimer?.cancel();
+          }
+        });
+
         // Update the playback rate in the playlist provider
-        _playlistProvider.playbackRate = clampedPlaybackRate;
-        _playlistProvider.audioPlayer.setSpeed(clampedPlaybackRate);
+        // _playlistProvider.playbackRate = clampedPlaybackRate;
+        // _playlistProvider.audioPlayer.setSpeed(clampedPlaybackRate);
       }
       notifyListeners(); // Without this it starts changing playback rate only after changing tabs
     }
@@ -205,6 +241,8 @@ class StepDetectionProvider with ChangeNotifier {
       prefs.getDouble('minBPM') ?? 110,
       prefs.getDouble('maxBPM') ?? 150,
     );
+
+    _smoothingFactor = prefs.getDouble('smoothingFactor') ?? 0.1; // Load smoothing factor or default to 0.1
     // ...
 
     notifyListeners(); // Notify listeners about loaded settings
@@ -215,6 +253,7 @@ class StepDetectionProvider with ChangeNotifier {
     prefs.setBool('isRunningMode', _isRunningMode);
     prefs.setDouble('minBPM', _compatibleBPMRange.start);
     prefs.setDouble('maxBPM', _compatibleBPMRange.end);
+    prefs.setDouble('smoothingFactor', _smoothingFactor);
     // ...
   }
 }

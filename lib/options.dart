@@ -24,175 +24,210 @@ class _OptionsState extends State<Options> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          ListTile(
-            title: Text(
-              "Enable Dark Mode",
-              style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontStyle: FontStyle.normal,
-                fontSize: 16,
-                // color: Color(0xff000000),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ListTile(
+              title: Text(
+                "Enable Dark Mode",
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 16,
+                  // color: Color(0xff000000),
+                ),
+              ),
+              trailing: Switch(
+                value: 
+                  Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
+                onChanged: (value) => 
+                  Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
+                activeColor: Theme.of(context).colorScheme.onPrimary,
+                activeTrackColor: Theme.of(context).colorScheme.primary,
+                inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+                inactiveTrackColor: Theme.of(context).canvasColor,
               ),
             ),
-            trailing: Switch(
-              value: 
-                Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
-              onChanged: (value) => 
-                Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Adjust range of playback rate changes",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      // color: Color(0xff000000),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(".5x", style: TextStyle(fontWeight: FontWeight.w600)),
+                      Container(
+                        width: 780 / MediaQuery.of(context).devicePixelRatio,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: RangeSlider(
+                            // values: _playbackRateRange,
+                            values: Provider.of<PlaylistProvider>(context).playbackRateRange, // Access from provider
+                            min: 0.5,
+                            max: 2.0,
+                            divisions: 15,
+                            labels: RangeLabels(
+                              // _playbackRateRange.start.toStringAsFixed(1),
+                              // _playbackRateRange.end.toStringAsFixed(1),
+                              Provider.of<PlaylistProvider>(context).playbackRateRange.start.toStringAsFixed(1),
+                              Provider.of<PlaylistProvider>(context).playbackRateRange.end.toStringAsFixed(1),
+                            ),
+                            onChanged: (RangeValues values) {
+                              setState(() {
+                                // _playbackRateRange = values;
+        
+                                // Update the PlaylistProvider's playback rate range (see step 4)
+                                // Provider.of<PlaylistProvider>(context, listen: false).minPlaybackRate = values.start;
+                                // Provider.of<PlaylistProvider>(context, listen: false).maxPlaybackRate = values.end;
+                                Provider.of<PlaylistProvider>(context, listen: false).playbackRateRange = values;
+                              });
+                            },
+                            // activeColor: Colors.black,
+                            // inactiveColor: Colors.black.withOpacity(0.3),
+                          ),
+                        ),
+                      ),
+                      Text("2x", style: TextStyle(fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+        
+            // Slider for adjusting the buffer
+            Slider(
+              value: Provider.of<StepDetectionProvider>(context).bufferMilliseconds,
+              min: 100,
+              max: 1000,
+              divisions: 9,
+              label: Provider.of<StepDetectionProvider>(context).bufferMilliseconds.round().toString(),
+              onChanged: (value) {
+                Provider.of<StepDetectionProvider>(context, listen: false).bufferMilliseconds = value;
+              },
+            ),
+            Text('Buffer: ${Provider.of<StepDetectionProvider>(context).bufferMilliseconds.round()} ms'),
+        
+            // Slider for adjusting the threshold
+            Slider(
+              value: Provider.of<StepDetectionProvider>(context).threshold,
+              min: 5,
+              max: 20,
+              divisions: 15,
+              label: Provider.of<StepDetectionProvider>(context).threshold.toString(),
+              onChanged: (value) {
+                Provider.of<StepDetectionProvider>(context, listen: false).threshold = value;
+              },
+            ),
+            Text('Threshold: ${Provider.of<StepDetectionProvider>(context).threshold}'),
+        
+            SwitchListTile(
+              // value: _isRunningMode, // Doing it in this waymakes it always reset to false when changing page
+              value: Provider.of<StepDetectionProvider>(context).isRunningMode, // Access from provider to prevent resetting
+              title: Text("Running Mode"),
+              onChanged: (value) {
+                setState(() {
+                  // _isRunningMode = value;
+                  // Update the StepDetectionProvider's running mode state (see step 5)
+                  Provider.of<StepDetectionProvider>(context, listen: false).isRunningMode = value;
+                });
+              },
               activeColor: Theme.of(context).colorScheme.onPrimary,
               activeTrackColor: Theme.of(context).colorScheme.primary,
               inactiveThumbColor: Theme.of(context).colorScheme.secondary,
               inactiveTrackColor: Theme.of(context).canvasColor,
+              // ...
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Adjust range of playback rate changes",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16,
-                    // color: Color(0xff000000),
+        
+            // Compatible BPM Range Slider
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Allow songs in this BPM range",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(".5x", style: TextStyle(fontWeight: FontWeight.w600)),
-                    Container(
-                      width: 780 / MediaQuery.of(context).devicePixelRatio,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: RangeSlider(
-                          // values: _playbackRateRange,
-                          values: Provider.of<PlaylistProvider>(context).playbackRateRange, // Access from provider
-                          min: 0.5,
-                          max: 2.0,
-                          divisions: 15,
-                          labels: RangeLabels(
-                            // _playbackRateRange.start.toStringAsFixed(1),
-                            // _playbackRateRange.end.toStringAsFixed(1),
-                            Provider.of<PlaylistProvider>(context).playbackRateRange.start.toStringAsFixed(1),
-                            Provider.of<PlaylistProvider>(context).playbackRateRange.end.toStringAsFixed(1),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("40", style: TextStyle(fontWeight: FontWeight.w600)),
+                      Container(
+                        width: 780 / MediaQuery.of(context).devicePixelRatio,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: RangeSlider(
+                            values: _compatibleBPMRange,
+                            min: 40,
+                            max: 200,
+                            divisions: 160,
+                            labels: RangeLabels(
+                              _compatibleBPMRange.start.round().toString(),
+                              _compatibleBPMRange.end.round().toString(),
+                            ),
+                            onChanged: (RangeValues values) {
+                              setState(() {
+                                _compatibleBPMRange = values;
+                                // Update the StepDetectionProvider's compatible BPM range
+                                Provider.of<StepDetectionProvider>(context, listen: false).compatibleBPMRange = values;
+                              });
+                            },
                           ),
-                          onChanged: (RangeValues values) {
-                            setState(() {
-                              // _playbackRateRange = values;
-
-                              // Update the PlaylistProvider's playback rate range (see step 4)
-                              // Provider.of<PlaylistProvider>(context, listen: false).minPlaybackRate = values.start;
-                              // Provider.of<PlaylistProvider>(context, listen: false).maxPlaybackRate = values.end;
-                              Provider.of<PlaylistProvider>(context, listen: false).playbackRateRange = values;
-                            });
-                          },
-                          // activeColor: Colors.black,
-                          // inactiveColor: Colors.black.withOpacity(0.3),
                         ),
                       ),
-                    ),
-                    Text("2x", style: TextStyle(fontWeight: FontWeight.w600)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Slider for adjusting the buffer
-          Slider(
-            value: Provider.of<StepDetectionProvider>(context).bufferMilliseconds,
-            min: 100,
-            max: 1000,
-            divisions: 9,
-            label: Provider.of<StepDetectionProvider>(context).bufferMilliseconds.round().toString(),
-            onChanged: (value) {
-              Provider.of<StepDetectionProvider>(context, listen: false).bufferMilliseconds = value;
-            },
-          ),
-          Text('Buffer: ${Provider.of<StepDetectionProvider>(context).bufferMilliseconds.round()} ms'),
-
-          // Slider for adjusting the threshold
-          Slider(
-            value: Provider.of<StepDetectionProvider>(context).threshold,
-            min: 5,
-            max: 20,
-            divisions: 15,
-            label: Provider.of<StepDetectionProvider>(context).threshold.toString(),
-            onChanged: (value) {
-              Provider.of<StepDetectionProvider>(context, listen: false).threshold = value;
-            },
-          ),
-          Text('Threshold: ${Provider.of<StepDetectionProvider>(context).threshold}'),
-
-          SwitchListTile(
-            // value: _isRunningMode, // Doing it in this waymakes it always reset to false when changing page
-            value: Provider.of<StepDetectionProvider>(context).isRunningMode, // Access from provider to prevent resetting
-            title: Text("Running Mode"),
-            onChanged: (value) {
-              setState(() {
-                // _isRunningMode = value;
-                // Update the StepDetectionProvider's running mode state (see step 5)
-                Provider.of<StepDetectionProvider>(context, listen: false).isRunningMode = value;
-              });
-            },
-            activeColor: Theme.of(context).colorScheme.onPrimary,
-            activeTrackColor: Theme.of(context).colorScheme.primary,
-            inactiveThumbColor: Theme.of(context).colorScheme.secondary,
-            inactiveTrackColor: Theme.of(context).canvasColor,
-            // ...
-          ),
-
-          // Compatible BPM Range Slider
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Allow songs in this BPM range",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16,
+                      Text("200", style: TextStyle(fontWeight: FontWeight.w600)),
+                    ],
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("40", style: TextStyle(fontWeight: FontWeight.w600)),
-                    Container(
-                      width: 780 / MediaQuery.of(context).devicePixelRatio,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: RangeSlider(
-                          values: _compatibleBPMRange,
-                          min: 40,
-                          max: 200,
-                          divisions: 160,
-                          labels: RangeLabels(
-                            _compatibleBPMRange.start.round().toString(),
-                            _compatibleBPMRange.end.round().toString(),
-                          ),
-                          onChanged: (RangeValues values) {
-                            setState(() {
-                              _compatibleBPMRange = values;
-                              // Update the StepDetectionProvider's compatible BPM range
-                              Provider.of<StepDetectionProvider>(context, listen: false).compatibleBPMRange = values;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                    Text("200", style: TextStyle(fontWeight: FontWeight.w600)),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+        
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Playback rate smoothing factor",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Slider(
+                    value: Provider.of<StepDetectionProvider>(context).smoothingFactor,
+                    min: 0.01,
+                    max: 1.0,
+                    divisions: 99,
+                    label: Provider.of<StepDetectionProvider>(context).smoothingFactor.toStringAsFixed(2),
+                    onChanged: (value) {
+                      Provider.of<StepDetectionProvider>(context, listen: false).smoothingFactor = value;
+                    },
+                  ),
+                  Text(
+                    "Adjusts how quickly the music playback rate adapts to your steps. Lower values = smoother transitions, higher values = faster adaptation. Lower values cause more audio artifacts.",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.secondary, // Optional: Use a secondary color for the description
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
