@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'step_detection_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
-import 'dart:math';
+// import 'dart:math';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -87,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
+
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                         child: Align(
@@ -97,9 +98,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               final currentSong = playlistProvider.getMostRecentSong();
                               double currentBPM = currentSong?.BPM ?? 0.0; // Get current song BPM or default to 0.0
                               double currentSPM = stepDetectionProvider.currentSPM; // Get current SPM
-                              double percentageDifference = ((currentSPM - currentBPM) / currentBPM) * 100; // Calculate percentage difference
-                              double playbackRateChange = playlistProvider.playbackRate - 1.0; // Calculate playback rate change
-                              double playbackRateBPMEquivalent = playbackRateChange * currentBPM; // Calculate playback rate BPM equivalent
+                              // double percentageDifference = ((currentSPM - currentBPM) / currentBPM) * 100;
+                              double playbackRateChange = playlistProvider.playbackRate - 1.0;
+                              // double playbackRateBPMEquivalent = playbackRateChange * currentBPM; 
                               double currentPlaybackRate = playlistProvider.playbackRate;
 
                               return SizedBox(
@@ -151,7 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       pointers: <GaugePointer>[
                                         // Main pointer (user SPM)
                                         NeedlePointer(
-                                          value: percentageDifference,
+                                          // value: percentageDifference,
+                                          value: playbackRateChange*100, // To match (currentPlaybackRate / 2) * 200 - 100 on the gauge
                                           needleLength: 0.55,
                                           // enableAnimation: true,
                                           // animationDuration: 100,
@@ -181,12 +183,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           sizeUnit: GaugeSizeUnit.factor,
                                         ),
                                       ],
+                                      // Circular annotation for the SPM value at the needle tip
                                       annotations: <GaugeAnnotation>[
-                                        // Percentage difference annotation
-                                        // Annotation for the SPM value at the needle tip
                                         GaugeAnnotation(
                                           // axisValue: (currentSPM-currentBPM),
-                                          axisValue: percentageDifference,
+                                          // axisValue: percentageDifference,
+                                          axisValue: playbackRateChange*100,
                                           widget: Container(
                                             width: 33,
                                             height: 33,
@@ -212,6 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           // angle: -90,
                                           positionFactor: 0.842, // Adjust position to be at the needle tip
                                         ),
+                                        // Comparison text under the gauge
                                         GaugeAnnotation(
                                           widget: Container(
                                             child: Text(
@@ -225,10 +228,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           angle: 90,
                                           positionFactor: 0.8,
                                         ),
+                                        // Big % text at the center of the gauge
                                         GaugeAnnotation(widget: 
                                           Container(
                                             child: Text(
-                                              '${percentageDifference.toStringAsFixed(0)}%',
+                                              // '${percentageDifference.toStringAsFixed(0)}%',
+                                              '${(playbackRateChange*100).toStringAsFixed(0)}%',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 24,
