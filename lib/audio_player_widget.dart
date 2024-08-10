@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_pedometer_ui/models/playlist_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   @override
@@ -18,6 +19,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     return Consumer<PlaylistProvider>(
       builder: (context, playlistProvider, child) {
         final audioPlayer = playlistProvider.audioPlayer;
+        final playerController = playlistProvider.playerController; // Access playerController
         final currentIndex = playlistProvider.currentSongIndex;
         final currentSong = currentIndex != null && currentIndex < playlistProvider.playlist.length
             ? playlistProvider.playlist[currentIndex]
@@ -86,58 +88,101 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Expanded(
-                        child: StreamBuilder<Duration?>(
-                          stream: audioPlayer.positionStream,
-                          builder: (context, positionSnapshot) {
-                            final position = positionSnapshot.data ?? Duration.zero;
-        
-                            return StreamBuilder<Duration?>(
-                              stream: audioPlayer.durationStream,
-                              builder: (context, durationSnapshot) {
-                                final duration = durationSnapshot.data ?? Duration.zero;
-        
-                                return Column(
-                                  children: [
-                                    // TODO Add audio visualizer here (like: https://github.com/SerggioC/FlutterMusicPlayer/tree/master)
-                                    Slider(
-                                      value: position.inSeconds.toDouble(),
-                                      min: 0,
-                                      max: duration.inSeconds.toDouble(),
-                                      // activeColor: Color(0xff000000),
-                                      inactiveColor: Color.fromARGB(135, 190, 190, 190),
-                                      // thumbColor: Color(0xff000000),
-                                      onChanged: (value) {
-                                        // When the user is sliding
-                                        audioPlayer.seek(Duration(seconds: value.toInt()));
-                                      },
-                                      onChangeEnd: (double double) {
-                                        // Sliding has finished, go to that position in song duration
-                                        playlistProvider.seek(Duration(seconds: double.toInt()));
-                                      },
+                        child: Stack(
+                          alignment: Alignment.topCenter,
+                          children: [
+                            // Static Waveform
+                            currentSong != null
+                                ? Padding(
+                                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                  child: AudioFileWaveforms(
+                                      // Rebuild the widget when song changed
+                                      key: playlistProvider.getWaveformKey(currentSong.audioPath),
+
+                                      size: Size(MediaQuery.of(context).size.width, 48),
+                                      playerController: playerController,
+                                      waveformType: WaveformType.fitWidth,
+                                      enableSeekGesture: true,
+                                      playerWaveStyle: PlayerWaveStyle(
+                                        fixedWaveColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                        spacing: 7,
+                                        scaleFactor: 70
+                                        // extendWaveform: true,
+                                        // showMiddleLine: false, // Disable the middle line
+                                      ),
                                     ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                )
+                                : SizedBox(),
+
+                            // Live Waveform
+                            // currentSong != null
+                            //     ? AudioFileWaveforms(
+                            //         size: Size(MediaQuery.of(context).size.width, 100),
+                            //         playerController: playerController,
+                            //         enableSeekGesture: true,
+                            //         playerWaveStyle: PlayerWaveStyle(
+                            //           fixedWaveColor: Theme.of(context).colorScheme.primary,
+                            //           liveWaveColor: Theme.of(context).colorScheme.primary,
+                            //           waveCap: StrokeCap.round,
+                            //         ),
+                            //       )
+                            //     : SizedBox(),
+
+                            // Slider
+                            StreamBuilder<Duration?>(
+                              stream: audioPlayer.positionStream,
+                              builder: (context, positionSnapshot) {
+                                final position = positionSnapshot.data ?? Duration.zero;
+                                    
+                                return StreamBuilder<Duration?>(
+                                  stream: audioPlayer.durationStream,
+                                  builder: (context, durationSnapshot) {
+                                    final duration = durationSnapshot.data ?? Duration.zero;
+                                    
+                                    return Column(
                                       children: [
-                                        Text(formatTime(position), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
-                                        SizedBox(width: 10),
-                                        // Display song name and artist name, if not null
-                                        Flexible(flex: 1,
-                                          child: Text(
-                                            currentSong != null
-                                                ? '${currentSong.songName} - ${currentSong.artistName}'
-                                                : 'No song playing',
-                                            overflow: TextOverflow.ellipsis,
-                                          ),),
-                                        SizedBox(width: 5),
-                                        Text(formatTime(duration), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
+                                        // TODO Add audio visualizer here (like: https://github.com/SerggioC/FlutterMusicPlayer/tree/master)
+                                        Slider(
+                                          value: position.inSeconds.toDouble(),
+                                          min: 0,
+                                          max: duration.inSeconds.toDouble(),
+                                          // activeColor: Color(0xff000000),
+                                          inactiveColor: Color.fromARGB(135, 190, 190, 190),
+                                          // thumbColor: Color(0xff000000),
+                                          onChanged: (value) {
+                                            // When the user is sliding
+                                            audioPlayer.seek(Duration(seconds: value.toInt()));
+                                          },
+                                          onChangeEnd: (double double) {
+                                            // Sliding has finished, go to that position in song duration
+                                            playlistProvider.seek(Duration(seconds: double.toInt()));
+                                          },
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(formatTime(position), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
+                                            SizedBox(width: 10),
+                                            // Display song name and artist name, if not null
+                                            Flexible(flex: 1,
+                                              child: Text(
+                                                currentSong != null
+                                                    ? '${currentSong.songName} - ${currentSong.artistName}'
+                                                    : 'No song playing',
+                                                overflow: TextOverflow.ellipsis,
+                                              ),),
+                                            SizedBox(width: 5),
+                                            Text(formatTime(duration), style: TextStyle(color: Theme.of(context).colorScheme.secondary),),
+                                          ],
+                                        ),
+                                        SizedBox(height: 10),
                                       ],
-                                    ),
-                                    SizedBox(height: 10),
-                                  ],
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
+                            ),
+                          ],
                         ),
                       ),
                       // TODO Add here the step count

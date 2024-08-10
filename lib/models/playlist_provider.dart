@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // Import for jsonEncode and jsonDecode
+import 'package:audio_waveforms/audio_waveforms.dart';
 
 // Thanks https://youtu.be/Zr4j6W7nmpg
 class PlaylistProvider extends ChangeNotifier {
@@ -33,6 +34,10 @@ class PlaylistProvider extends ChangeNotifier {
 
   RangeValues _playbackRateRange = RangeValues(0.5, 2.0); // Default values for speed range
 
+  // Add PlayerController
+  PlayerController playerController = PlayerController(); 
+  // Add a unique key for each song
+  final Map<String, GlobalKey> _waveformKeys = {};
 
   // Getters
   List<SongModel> get playlist => _playlist;
@@ -65,6 +70,13 @@ class PlaylistProvider extends ChangeNotifier {
     _minPlaybackRate = values.start; // Update minPlaybackRate
     _maxPlaybackRate = values.end;   // Update maxPlaybackRate
     notifyListeners();
+  }
+
+  GlobalKey getWaveformKey(String songPath) {
+    if (!_waveformKeys.containsKey(songPath)) {
+      _waveformKeys[songPath] = GlobalKey();
+    }
+    return _waveformKeys[songPath]!;
   }
 
   // Other setters and methods
@@ -105,6 +117,10 @@ class PlaylistProvider extends ChangeNotifier {
           tag: mediaItem,
         ),
       );
+
+      // Prepare playerController 
+      await playerController.preparePlayer(path: song.audioPath);
+
       await _audioPlayer.play();
       _isPlaying = true;
       notifyListeners();
@@ -209,6 +225,8 @@ class PlaylistProvider extends ChangeNotifier {
   }
 
   PlaylistProvider() {
+    playerController = PlayerController();
+
     _audioPlayer.positionStream.listen((position) {
       _currentDuration = position;
       notifyListeners();
@@ -228,8 +246,27 @@ class PlaylistProvider extends ChangeNotifier {
         playNextSong();
       }
     });
+
+    // Listen for changes in currentSongIndex and prepare a new playerController
+    _audioPlayer.currentIndexStream.listen((index) { 
+      if (index != null && index < _playlist.length) {
+        final song = _playlist[index];
+
+        // Create a new PlayerController 
+        playerController.dispose(); // Dispose the old controller
+        playerController = PlayerController(); // Create a new one
+        playerController.preparePlayer(path: song.audioPath);
+      }
+    });
     
     _loadPlaylistFromStorage(); // Load playlist data on initialization
+  }
+
+  // Override dispose to dispose playerController
+  @override
+  void dispose() {
+    playerController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadPlaylistFromStorage() async {
