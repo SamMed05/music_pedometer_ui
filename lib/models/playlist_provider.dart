@@ -5,6 +5,9 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // Import for jsonEncode and jsonDecode
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart'; 
 
 // Thanks https://youtu.be/Zr4j6W7nmpg
 class PlaylistProvider extends ChangeNotifier {
@@ -293,5 +296,75 @@ class PlaylistProvider extends ChangeNotifier {
     List<Map<String, dynamic>> playlistData = _playlist.map((song) => song.toJson()).toList();
     String playlistJson = jsonEncode(playlistData);
     await prefs.setString('playlist', playlistJson);
+  }
+
+
+  // Export Playlist
+  Future<void> exportPlaylist() async {
+    try {
+      // Get app documents directory
+      // Directory? directory = await getExternalStorageDirectory(); // Use external storage
+      // Get downloads directory
+      Directory? downloadsDirectory = await getDownloadsDirectory(); // Use external storage
+      if (downloadsDirectory == null) {
+        throw Exception("External storage directory not found"); 
+      }
+
+      // Create a playlist file (e.g., "playlist.json")
+      // File playlistFile = File('${directory.path}/playlist.json');
+      File playlistFile = File('${downloadsDirectory.path}/playlist.json'); 
+
+      // Convert the playlist to JSON
+      String playlistJson = jsonEncode(_playlist);
+
+      // Write the JSON to the file
+      await playlistFile.writeAsString(playlistJson);
+
+      // Show a success message (you can use a SnackBar or Dialog)
+      print('Playlist exported to: ${playlistFile.path}');
+
+    } catch (e) {
+      // Handle errors (e.g., show an error message)
+      print('Error exporting playlist: $e');
+    }
+  }
+
+  // Import Playlist
+  Future<void> importPlaylist() async {
+    try {
+      // Pick a JSON file
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+
+      if (result != null) {
+        // Read the content of the selected file
+        File file = File(result.files.single.path!);
+        String playlistJson = await file.readAsString();
+
+        // Decode the JSON data
+        List<dynamic> decodedPlaylist = json.decode(playlistJson);
+
+        // Clear the existing playlist
+        _playlist.clear();
+
+        // Add songs from the imported data
+        for (var songData in decodedPlaylist) {
+          _playlist.add(SongModel.fromJson(songData));
+        }
+
+        // Reset the player and notify listeners
+        _audioPlayer.stop();
+        _currentSongIndex = null;
+        notifyListeners();
+
+        // Show a success message
+        print('Playlist imported successfully');
+      }
+    } catch (e) {
+      // Handle errors (e.g., show an error message)
+      print('Error importing playlist: $e');
+    }
   }
 }

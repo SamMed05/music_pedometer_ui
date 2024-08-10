@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:music_pedometer_ui/models/playlist_provider.dart';
+import 'package:provider/provider.dart';
 
 class CommonDrawer extends StatefulWidget {
   @override
@@ -85,6 +87,27 @@ class _CommonDrawerState extends State<CommonDrawer> {
                   ),
                 ],
               );
+            },
+          ),
+
+          
+          // Import Playlist
+          ListTile(
+            title: Text('Import Playlist'),
+            onTap: () {
+              // Call the importPlaylist() function from your PlaylistProvider
+              Provider.of<PlaylistProvider>(context, listen: false).importPlaylist();
+              Navigator.pop(context); // Close the drawer
+            },
+          ),
+
+          // Export Playlist
+          ListTile(
+            title: Text('Export Playlist'),
+            onTap: () {
+              // Call the exportPlaylist() function from your PlaylistProvider
+              Provider.of<PlaylistProvider>(context, listen: false).exportPlaylist();
+              Navigator.pop(context); // Close the drawer
             },
           ),
         ],
