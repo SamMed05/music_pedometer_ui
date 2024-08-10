@@ -18,6 +18,7 @@ class StepDetectionProvider with ChangeNotifier {
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   bool _isRunningMode = false;
   bool _isSyncActive = true; // Track whether sync is active
+  String _tempoMode = 'Normal';
 
   List<FlSpot> _accData = []; // List to store accelerometer data points
 
@@ -82,6 +83,13 @@ class StepDetectionProvider with ChangeNotifier {
     notifyListeners();
 
     _saveSettingsToStorage(); // Save the updated setting
+  }
+
+  String get tempoMode => _tempoMode;
+
+  set tempoMode(String newMode) {
+    _tempoMode = newMode;
+    notifyListeners(); // Notify listeners (important for updating UI)
   }
 
 
@@ -162,6 +170,13 @@ class StepDetectionProvider with ChangeNotifier {
         double? _originalBPM = _playlistProvider.playlist[_playlistProvider.currentSongIndex!].BPM;
 
         double _playbackRate = _userSPM / _originalBPM; // Calculate playback rate for sync
+
+        // Apply tempo mode adjustment
+        if (_tempoMode == "HalfTime") {
+          _playbackRate /= 2;
+        } else if (_tempoMode == "DoubleTime") {
+          _playbackRate *= 2;
+        }
 
         // Clamp the playback rate using minPlaybackRate and maxPlaybackRate
         double clampedPlaybackRate = _playbackRate.clamp(

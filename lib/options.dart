@@ -21,6 +21,9 @@ class _OptionsState extends State<Options> {
   // RangeValues _playbackRateRange = RangeValues(minPlaybackRate, maxPlaybackRate);
   RangeValues _compatibleBPMRange = RangeValues(80, 140); // Default compatible BPM range
 
+  // Tempo Mode (default to Normal)
+  String _tempoMode = 'Normal'; // This variable doesn't need to be saved when the app is closed, so it's here
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -224,6 +227,27 @@ class _OptionsState extends State<Options> {
                     ),
                   ),
                 ],
+              ),
+            ),
+
+            // Tempo Mode Dropdown
+            ListTile(
+              title: Text("Tempo Mode"),
+              trailing: DropdownButton<String>(
+                value: _tempoMode,
+                items: ['HalfTime', 'Normal', 'DoubleTime'].map((String mode) {
+                  return DropdownMenuItem<String>(
+                    value: mode,
+                    child: Text(mode),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _tempoMode = newValue!;
+                    // Update the tempo mode in your PlaylistProvider 
+                    Provider.of<StepDetectionProvider>(context, listen: false).tempoMode = newValue;
+                  });
+                },
               ),
             ),
           ],
