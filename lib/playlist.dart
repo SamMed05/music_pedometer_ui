@@ -68,7 +68,7 @@ class _PlaylistPage extends State<Playlist> {
                   });
                 },
                 title: Text(
-                  "Only compatible songs",
+                  'Only compatible songs',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontStyle: FontStyle.normal,
@@ -78,7 +78,7 @@ class _PlaylistPage extends State<Playlist> {
                   textAlign: TextAlign.start,
                 ),
                 subtitle: Text(
-                  "Recommend songs that are in your BPM range (edit in Options)",
+                  'Recommend songs that are in your BPM range (edit in Options)',
                   style: TextStyle(
                     fontWeight: FontWeight.w300,
                     fontStyle: FontStyle.normal,
@@ -112,7 +112,7 @@ class _PlaylistPage extends State<Playlist> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Active",
+                      'Active',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontStyle: FontStyle.normal,
@@ -122,7 +122,7 @@ class _PlaylistPage extends State<Playlist> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      "Songs",
+                      'Songs',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontStyle: FontStyle.normal,
@@ -132,9 +132,9 @@ class _PlaylistPage extends State<Playlist> {
                       textAlign: TextAlign.center,
                     ),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                      padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                       child: Text(
-                        "BPM",
+                        'BPM',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontStyle: FontStyle.normal,
@@ -164,10 +164,10 @@ class _PlaylistPage extends State<Playlist> {
             onPressed: () {
               pickFile();
             },
-            backgroundColor: Theme.of(context).canvasColor,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             child: Icon(
               Icons.audio_file,
-              color: Theme.of(context).colorScheme.primary,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
         );
@@ -190,8 +190,8 @@ class _PlaylistPage extends State<Playlist> {
         final newSong = SongModel(
           isSelected: true,
           songName: fileName,
-          artistName: "/",
-          coverImage: Uri.parse("assets/images/music-icon.png").toString(),
+          artistName: '/',
+          coverImage: Uri.parse('assets/images/music-icon.png').toString(),
           audioPath: path,
           BPM: 0,
         );
@@ -320,7 +320,7 @@ class _PlaylistPage extends State<Playlist> {
               Padding(
                 padding: EdgeInsets.all(5),
                 child: Checkbox(
-                  // TODO Make chekcbox actually "checkable"
+                  // TODO Make chekcbox actually 'checkable'
                   value: playlistProvider.playlist[index].isSelected,
                   onChanged: (value) {
                     setState(() {
@@ -353,10 +353,10 @@ class _PlaylistPage extends State<Playlist> {
                     width: 180,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(41, 128, 128, 128),
+                      color: Color(0x1f000000),
                       shape: BoxShape.rectangle,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Color(0x4d9e9e9e), width: 0),
+                      border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -375,8 +375,6 @@ class _PlaylistPage extends State<Playlist> {
                             borderRadius: BorderRadius.circular(8),
                             child: Image(
                               image: AssetImage(playlistProvider.playlist[index].coverImage),
-                              height: 50,
-                              width: 50,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -399,7 +397,6 @@ class _PlaylistPage extends State<Playlist> {
                                     fontWeight: FontWeight.w500,
                                     fontStyle: FontStyle.normal,
                                     fontSize: 14,
-                                    // color: Color(0xff000000),
                                   ),
                                 ),
                                 Text(
@@ -410,7 +407,7 @@ class _PlaylistPage extends State<Playlist> {
                                     fontWeight: FontWeight.w400,
                                     fontStyle: FontStyle.normal,
                                     fontSize: 13,
-                                    // color: Color(0xff000000),
+                                    color: Colors.grey,
                                   ),
                                 ),
                               ],
@@ -425,7 +422,7 @@ class _PlaylistPage extends State<Playlist> {
               // BPM number
               Container(
                 alignment: Alignment.center,
-                margin: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                margin: EdgeInsets.symmetric(vertical: 0, horizontal: 14),
                 padding: EdgeInsets.all(3),
                 width: 60,
                 height: 60,
@@ -433,7 +430,7 @@ class _PlaylistPage extends State<Playlist> {
                   color: Color.fromARGB(41, 128, 128, 128),
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(100),
-                  border: Border.all(color: Color(0x4d9e9e9e), width: 0),
+                  border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                 ),
                 // TODO Make BPM tappable with GestureDetector (https://api.flutter.dev/flutter/widgets/GestureDetector-class.html)
                 child: InkWell(
@@ -442,12 +439,12 @@ class _PlaylistPage extends State<Playlist> {
                     await _showEditBPMDialog(index);
                   },
                   child: Text(
-                    playlistProvider.playlist[index].BPM.toString(),
+                    playlistProvider.playlist[index].BPM.toInt().toString(), // Remove decimals
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontStyle: FontStyle.normal,
-                      fontSize: 16,
+                      fontSize: 19,
                       // color: Color(0xff000000),
                     ),
                   ),
@@ -529,7 +526,7 @@ class _PlaylistPage extends State<Playlist> {
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  Text('Are you sure you want to delete "${playlistProvider.playlist[songIndex].songName}"?'),
+                  Text("Are you sure you want to delete '${playlistProvider.playlist[songIndex].songName}'?"),
                 ],
               ),
             ),

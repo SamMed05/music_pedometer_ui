@@ -16,10 +16,10 @@ class PlaylistProvider extends ChangeNotifier {
     // Initial list of songs
     // SongModel(
     //   isSelected: true,
-    //   songName: "Song 1",
-    //   artistName: "Artist 1",
-    //   coverImage: Uri.parse("assets/images/music-icon.png").toString(),
-    //   audioPath: Uri.parse("asset:///assets/audio-example.mp3").toString(),
+    //   songName: 'Song 1',
+    //   artistName: 'Artist 1',
+    //   coverImage: Uri.parse('assets/images/music-icon.png').toString(),
+    //   audioPath: Uri.parse('asset:///assets/audio-example.mp3').toString(),
     //   BPM: 135
     // ),
     // ...
@@ -108,7 +108,7 @@ class PlaylistProvider extends ChangeNotifier {
       final song = _playlist[_currentSongIndex!];
       final mediaItem = MediaItem(
         id: song.audioPath,
-        album: "Unknown Album",
+        album: 'Unknown Album',
         title: song.songName,
         artist: song.artistName,
         artUri: Uri.parse(song.coverImage),
@@ -280,7 +280,7 @@ class PlaylistProvider extends ChangeNotifier {
 
     if (playlistJson != null && playlistJson.isNotEmpty) {
       // Deserialize playlist data from JSON
-      print("JSON String: $playlistJson");
+      print('JSON String: $playlistJson');
       List<dynamic> decodedPlaylist = jsonDecode(playlistJson);
       _playlist.clear(); // Clear the current playlist
       for (var songData in decodedPlaylist) {
@@ -307,10 +307,10 @@ class PlaylistProvider extends ChangeNotifier {
       // Get downloads directory
       Directory? downloadsDirectory = await getDownloadsDirectory(); // Use external storage
       if (downloadsDirectory == null) {
-        throw Exception("External storage directory not found"); 
+        throw Exception('External storage directory not found'); 
       }
 
-      // Create a playlist file (e.g., "playlist.json")
+      // Create a playlist file (e.g., 'playlist.json')
       // File playlistFile = File('${directory.path}/playlist.json');
       File playlistFile = File('${downloadsDirectory.path}/playlist.json'); 
 

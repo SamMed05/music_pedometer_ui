@@ -10,7 +10,7 @@ class CommonDrawer extends StatefulWidget {
 }
 
 class _CommonDrawerState extends State<CommonDrawer> {
-  String _versionNumber = ""; 
+  String _versionNumber = ''; 
 
   // State variable to hold the version number
   @override

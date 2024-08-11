@@ -24,7 +24,7 @@ class _OptionsState extends State<Options> {
   // Tempo Mode (default to Normal)
   //String _tempoMode = 'Normal'; // This variable doesn't need to be saved when the app is closed, so it's here
   
-  bool _isSyncActive = true; // Track whether sync is active
+  // bool _isSyncActive = true; // Track whether sync is active
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +34,9 @@ class _OptionsState extends State<Options> {
           children: [
             // Activate Sync Switch
             SwitchListTile(
-              value: _isSyncActive,
+              value: Provider.of<StepDetectionProvider>(context, listen: false).isSyncActive,
               title: Text(
-                "Activate Sync",
+                'Activate Sync',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontStyle: FontStyle.normal,
@@ -46,7 +46,7 @@ class _OptionsState extends State<Options> {
                 textAlign: TextAlign.start,
               ),
               subtitle: Text(
-                "Sync music BPM to your steps",
+                'Sync music BPM to your steps',
                 style: TextStyle(
                   fontWeight: FontWeight.w300,
                   fontStyle: FontStyle.normal,
@@ -57,11 +57,12 @@ class _OptionsState extends State<Options> {
               ),
               onChanged: (value) {
                 setState(() {
-                  _isSyncActive = value;
+                  // _isSyncActive = value;
                   // Update the StepDetectionProvider's sync state
                   Provider.of<StepDetectionProvider>(context, listen: false).isSyncActive = value;
                 });
               },
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               // tileColor: Theme.of(context).colorScheme.onSecondary,
               activeColor: Theme.of(context).colorScheme.onPrimary,
               activeTrackColor: Theme.of(context).colorScheme.primary,
@@ -77,14 +78,14 @@ class _OptionsState extends State<Options> {
               // value: _isRunningMode, // Doing it in this way makes it always reset to false when changing page
               value: Provider.of<StepDetectionProvider>(context).isRunningMode, // Access from provider to prevent resetting
               title: Text(
-                "Running Mode",
+                'Activate Running Mode',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
                 ),
               ),
               subtitle: Text(
-                "Adjust settings for running",
+                'Adjust settings for running',
                 style: TextStyle(
                   fontWeight: FontWeight.w300,
                   fontSize: 13,
@@ -95,6 +96,7 @@ class _OptionsState extends State<Options> {
                   Provider.of<StepDetectionProvider>(context, listen: false).isRunningMode = value;
                 });
               },
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               secondary: Icon(Icons.directions_run, size: 24),
               activeColor: Theme.of(context).colorScheme.onPrimary,
               activeTrackColor: Theme.of(context).colorScheme.primary,
@@ -107,13 +109,13 @@ class _OptionsState extends State<Options> {
             SwitchListTile(
               value: Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
               title: Text(
-                "Activate Dark Mode",
+                'Activate Dark Mode',
                 style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontStyle: FontStyle.normal,
-                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
                 ),
               ),
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               secondary: Icon(Icons.dark_mode, size: 24),
               onChanged: (value) => Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
               activeColor: Theme.of(context).colorScheme.onPrimary,
@@ -123,14 +125,21 @@ class _OptionsState extends State<Options> {
               dense: true,
             ),
 
+            Divider(
+              height: 20,
+              color: Theme.of(context).colorScheme.onSecondary,
+              indent: 20,
+              endIndent: 20,
+            ),
+
             // Playback Change Range Slider
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Adjust range of playback rate changes",
+                    'Adjust range of playback rate changes',
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
@@ -139,7 +148,7 @@ class _OptionsState extends State<Options> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(".5x", style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('.5x', style: TextStyle(fontWeight: FontWeight.w600)),
                       Container(
                         width: 780 / MediaQuery.of(context).devicePixelRatio,
                         child: Padding(
@@ -171,7 +180,7 @@ class _OptionsState extends State<Options> {
                           ),
                         ),
                       ),
-                      Text("2x", style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('2x', style: TextStyle(fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ],
@@ -222,12 +231,12 @@ class _OptionsState extends State<Options> {
         
             // Compatible BPM Range Slider
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Allow songs in this BPM range",
+                    'Allow songs in this BPM range',
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
@@ -236,7 +245,7 @@ class _OptionsState extends State<Options> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("40", style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('40', style: TextStyle(fontWeight: FontWeight.w600)),
                       Container(
                         width: 780 / MediaQuery.of(context).devicePixelRatio,
                         child: Padding(
@@ -260,7 +269,7 @@ class _OptionsState extends State<Options> {
                           ),
                         ),
                       ),
-                      Text("200", style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('200', style: TextStyle(fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ],
@@ -268,16 +277,41 @@ class _OptionsState extends State<Options> {
             ),
         
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Playback rate smoothing factor",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Playback rate smoothing factor',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Tooltip(
+                        message: 'How quickly the music playback rate adapts to your steps. Lower values = smoother transitions (but more audio artifacts).',
+                        padding: EdgeInsets.all(16),
+                        preferBelow: false,
+                        child: InkWell(
+                          child: Container(
+                            padding: EdgeInsets.all(3),
+                            margin: EdgeInsets.only(left: 7),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.question_mark,
+                              size: 13,
+                              color: Colors.white,
+                            ),
+                          ),
+                          onTap: () {},
+                        ),
+                      ),
+                    ],
                   ),
                   Slider(
                     value: Provider.of<StepDetectionProvider>(context).smoothingFactor,
@@ -291,13 +325,13 @@ class _OptionsState extends State<Options> {
                     activeColor: Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey.withOpacity(0.5),
                   ),
-                  Text(
-                    "How quickly the music playback rate adapts to your steps. Lower values = smoother transitions (but more audio artifacts).",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                  ),
+                  // Text(
+                  //   'How quickly the music playback rate adapts to your steps. Lower values = smoother transitions (but more audio artifacts).',
+                  //   style: TextStyle(
+                  //     fontSize: 12,
+                  //     color: Theme.of(context).colorScheme.secondary,
+                  //   ),
+                  // ),
                 ],
               ),
             ),

@@ -172,9 +172,9 @@ class StepDetectionProvider with ChangeNotifier {
         double _playbackRate = _userSPM / _originalBPM; // Calculate playback rate for sync
 
         // Apply tempo mode adjustment
-        if (_tempoMode == "HalfTime") {
+        if (_tempoMode == 'HalfTime') {
           _playbackRate /= 2;
-        } else if (_tempoMode == "DoubleTime") {
+        } else if (_tempoMode == 'DoubleTime') {
           _playbackRate *= 2;
         }
 
