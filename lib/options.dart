@@ -22,7 +22,9 @@ class _OptionsState extends State<Options> {
   RangeValues _compatibleBPMRange = RangeValues(80, 140); // Default compatible BPM range
 
   // Tempo Mode (default to Normal)
-  String _tempoMode = 'Normal'; // This variable doesn't need to be saved when the app is closed, so it's here
+  //String _tempoMode = 'Normal'; // This variable doesn't need to be saved when the app is closed, so it's here
+  
+  bool _isSyncActive = true; // Track whether sync is active
 
   @override
   Widget build(BuildContext context) {
@@ -30,27 +32,98 @@ class _OptionsState extends State<Options> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ListTile(
+            // Activate Sync Switch
+            SwitchListTile(
+              value: _isSyncActive,
               title: Text(
-                "Enable Dark Mode",
+                "Activate Sync",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 15,
+                  // color: Color(0xff000000),
+                ),
+                textAlign: TextAlign.start,
+              ),
+              subtitle: Text(
+                "Sync music BPM to your steps",
+                style: TextStyle(
+                  fontWeight: FontWeight.w300,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 13,
+                  // color: Color(0xff000000),
+                ),
+                textAlign: TextAlign.start,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _isSyncActive = value;
+                  // Update the StepDetectionProvider's sync state
+                  Provider.of<StepDetectionProvider>(context, listen: false).isSyncActive = value;
+                });
+              },
+              // tileColor: Theme.of(context).colorScheme.onSecondary,
+              activeColor: Theme.of(context).colorScheme.onPrimary,
+              activeTrackColor: Theme.of(context).colorScheme.primary,
+              inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+              inactiveTrackColor: Theme.of(context).canvasColor,
+              secondary: Icon(Icons.timer, size: 24),
+              selected: false,
+              dense: true,
+            ),
+
+            // Running Mode Switch
+            SwitchListTile(
+              // value: _isRunningMode, // Doing it in this way makes it always reset to false when changing page
+              value: Provider.of<StepDetectionProvider>(context).isRunningMode, // Access from provider to prevent resetting
+              title: Text(
+                "Running Mode",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
+              ),
+              subtitle: Text(
+                "Adjust settings for running",
+                style: TextStyle(
+                  fontWeight: FontWeight.w300,
+                  fontSize: 13,
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  Provider.of<StepDetectionProvider>(context, listen: false).isRunningMode = value;
+                });
+              },
+              secondary: Icon(Icons.directions_run, size: 24),
+              activeColor: Theme.of(context).colorScheme.onPrimary,
+              activeTrackColor: Theme.of(context).colorScheme.primary,
+              inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+              inactiveTrackColor: Theme.of(context).canvasColor,
+              dense: true,
+            ),
+
+            // Dark Mode Switch
+            SwitchListTile(
+              value: Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
+              title: Text(
+                "Activate Dark Mode",
                 style: TextStyle(
                   fontWeight: FontWeight.w400,
                   fontStyle: FontStyle.normal,
                   fontSize: 16,
-                  // color: Color(0xff000000),
                 ),
               ),
-              trailing: Switch(
-                value: 
-                  Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
-                onChanged: (value) => 
-                  Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
-                activeColor: Theme.of(context).colorScheme.onPrimary,
-                activeTrackColor: Theme.of(context).colorScheme.primary,
-                inactiveThumbColor: Theme.of(context).colorScheme.secondary,
-                inactiveTrackColor: Theme.of(context).canvasColor,
-              ),
+              secondary: Icon(Icons.dark_mode, size: 24),
+              onChanged: (value) => Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
+              activeColor: Theme.of(context).colorScheme.onPrimary,
+              activeTrackColor: Theme.of(context).colorScheme.primary,
+              inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+              inactiveTrackColor: Theme.of(context).canvasColor,
+              dense: true,
             ),
+
+            // Playback Change Range Slider
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -61,7 +134,6 @@ class _OptionsState extends State<Options> {
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
-                      // color: Color(0xff000000),
                     ),
                   ),
                   Row(
@@ -71,7 +143,7 @@ class _OptionsState extends State<Options> {
                       Container(
                         width: 780 / MediaQuery.of(context).devicePixelRatio,
                         child: Padding(
-                          padding: const EdgeInsets.all(10.0),
+                          padding: const EdgeInsets.all(0.0),
                           child: RangeSlider(
                             // values: _playbackRateRange,
                             values: Provider.of<PlaylistProvider>(context).playbackRateRange, // Access from provider
@@ -107,6 +179,13 @@ class _OptionsState extends State<Options> {
             ),
         
             // Slider for adjusting the buffer
+            Text(
+              'Buffer: ${Provider.of<StepDetectionProvider>(context).bufferMilliseconds.round()} ms',
+              style: TextStyle(
+                fontWeight: FontWeight.w300,
+                fontSize: 13,
+              ),
+            ),
             Slider(
               value: Provider.of<StepDetectionProvider>(context).bufferMilliseconds,
               min: 100,
@@ -116,10 +195,18 @@ class _OptionsState extends State<Options> {
               onChanged: (value) {
                 Provider.of<StepDetectionProvider>(context, listen: false).bufferMilliseconds = value;
               },
+              activeColor: Theme.of(context).colorScheme.primary,
+              inactiveColor: Colors.grey.withOpacity(0.5),
             ),
-            Text('Buffer: ${Provider.of<StepDetectionProvider>(context).bufferMilliseconds.round()} ms'),
-        
+            
             // Slider for adjusting the threshold
+            Text(
+              'Threshold: ${Provider.of<StepDetectionProvider>(context).threshold}',
+              style: TextStyle(
+                fontWeight: FontWeight.w300,
+                fontSize: 13,
+              ),
+            ),
             Slider(
               value: Provider.of<StepDetectionProvider>(context).threshold,
               min: 5,
@@ -129,25 +216,8 @@ class _OptionsState extends State<Options> {
               onChanged: (value) {
                 Provider.of<StepDetectionProvider>(context, listen: false).threshold = value;
               },
-            ),
-            Text('Threshold: ${Provider.of<StepDetectionProvider>(context).threshold}'),
-        
-            SwitchListTile(
-              // value: _isRunningMode, // Doing it in this waymakes it always reset to false when changing page
-              value: Provider.of<StepDetectionProvider>(context).isRunningMode, // Access from provider to prevent resetting
-              title: Text("Running Mode"),
-              onChanged: (value) {
-                setState(() {
-                  // _isRunningMode = value;
-                  // Update the StepDetectionProvider's running mode state (see step 5)
-                  Provider.of<StepDetectionProvider>(context, listen: false).isRunningMode = value;
-                });
-              },
-              activeColor: Theme.of(context).colorScheme.onPrimary,
-              activeTrackColor: Theme.of(context).colorScheme.primary,
-              inactiveThumbColor: Theme.of(context).colorScheme.secondary,
-              inactiveTrackColor: Theme.of(context).canvasColor,
-              // ...
+              activeColor: Theme.of(context).colorScheme.primary,
+              inactiveColor: Colors.grey.withOpacity(0.5),
             ),
         
             // Compatible BPM Range Slider
@@ -170,7 +240,7 @@ class _OptionsState extends State<Options> {
                       Container(
                         width: 780 / MediaQuery.of(context).devicePixelRatio,
                         child: Padding(
-                          padding: const EdgeInsets.all(10.0),
+                          padding: const EdgeInsets.all(0.0),
                           child: RangeSlider(
                             values: _compatibleBPMRange,
                             min: 40,
@@ -218,36 +288,17 @@ class _OptionsState extends State<Options> {
                     onChanged: (value) {
                       Provider.of<StepDetectionProvider>(context, listen: false).smoothingFactor = value;
                     },
+                    activeColor: Theme.of(context).colorScheme.primary,
+                    inactiveColor: Colors.grey.withOpacity(0.5),
                   ),
                   Text(
-                    "Adjusts how quickly the music playback rate adapts to your steps. Lower values = smoother transitions, higher values = faster adaptation. Lower values cause more audio artifacts.",
+                    "How quickly the music playback rate adapts to your steps. Lower values = smoother transitions (but more audio artifacts).",
                     style: TextStyle(
                       fontSize: 12,
-                      color: Theme.of(context).colorScheme.secondary, // Optional: Use a secondary color for the description
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                 ],
-              ),
-            ),
-
-            // Tempo Mode Dropdown
-            ListTile(
-              title: Text("Tempo Mode"),
-              trailing: DropdownButton<String>(
-                value: _tempoMode,
-                items: ['HalfTime', 'Normal', 'DoubleTime'].map((String mode) {
-                  return DropdownMenuItem<String>(
-                    value: mode,
-                    child: Text(mode),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _tempoMode = newValue!;
-                    // Update the tempo mode in your PlaylistProvider 
-                    Provider.of<StepDetectionProvider>(context, listen: false).tempoMode = newValue;
-                  });
-                },
               ),
             ),
           ],

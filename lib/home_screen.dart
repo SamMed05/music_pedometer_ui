@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isSyncActive = true; // Track whether sync is active
+  // String _tempoMode = 'Normal'; // Track the selected tempo mode
   
   @override
   Widget build(BuildContext context) {
@@ -473,55 +473,44 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),],
               ),
             ),
+
+            
+            // Tempo Mode Segmented Button
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: SegmentedButton<String>(
+                segments: <ButtonSegment<String>>[
+                  ButtonSegment<String>(
+                    value: 'HalfTime',
+                    label: Text('HalfTime'),
+                  ),
+                  ButtonSegment<String>(
+                    value: 'Normal',
+                    label: Text('Normal'),
+                  ),
+                  ButtonSegment<String>(
+                    value: 'DoubleTime',
+                    label: Text('DoubleTime'),
+                  ),
+                ],
+                selected: <String>{Provider.of<StepDetectionProvider>(context, listen: false).tempoMode},
+                showSelectedIcon: false,
+                onSelectionChanged: (Set<String> newSelection) {
+                  setState(() {
+                    // _tempoMode = newSelection.first;
+                    // Update the tempo mode in your StepDetectionProvider
+                    // Provider.of<StepDetectionProvider>(context, listen: false).tempoMode = _tempoMode;
+                    
+                    // Access tempoMode from provider
+                    Provider.of<StepDetectionProvider>(context, listen: false).tempoMode = newSelection.first;
+                  });
+                },
+                style: ButtonStyle(
+                  fixedSize: WidgetStateProperty.all<Size>(Size.fromHeight(3)),
+                ),
+              ),
+            ),
           ],
-        ),
-        bottomNavigationBar: SwitchListTile(
-          value: _isSyncActive,
-          title: Text(
-            "Activate Sync",
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontStyle: FontStyle.normal,
-              fontSize: 15,
-              // color: Color(0xff000000),
-            ),
-            textAlign: TextAlign.start,
-          ),
-          subtitle: Text(
-            "Sync music BPM to your steps",
-            style: TextStyle(
-              fontWeight: FontWeight.w300,
-              fontStyle: FontStyle.normal,
-              fontSize: 13,
-              // color: Color(0xff000000),
-            ),
-            textAlign: TextAlign.start,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
-          onChanged: (value) {
-            setState(() {
-              _isSyncActive = value;
-              // Update the StepDetectionProvider's sync state
-              Provider.of<StepDetectionProvider>(context, listen: false).isSyncActive = value;
-            });
-          },
-          controlAffinity: ListTileControlAffinity.trailing,
-          dense: true,
-          // tileColor: Theme.of(context).colorScheme.onSecondary,
-          activeColor: Theme.of(context).colorScheme.onPrimary,
-          activeTrackColor: Theme.of(context).colorScheme.primary,
-          inactiveThumbColor: Theme.of(context).colorScheme.secondary,
-          inactiveTrackColor: Theme.of(context).canvasColor,
-          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-          secondary: Icon(
-            Icons.timer,
-            // color: Color(0xff000000),
-            size: 24
-          ),
-          selected: false,
-          selectedTileColor: Color(0x42000000),
         ),
       ),
     );
