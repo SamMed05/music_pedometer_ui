@@ -8,7 +8,7 @@
 A Flutter open source mobile app that synchronizes the music rhythm (BPM) to the the steps of the user (SPM).
 
 ## Screenshots
-| Screenshot 1 | Screenshot 2 | Screenshot 2 |
+| Screenshot 1 | Screenshot 2 | Screenshot 3 |
 |--------------|--------------|--------------|
 | ![screenshot1](assets/images/screenshots/screenshot1.jpg) | ![screenshot2](assets/images/screenshots/screenshot2.jpg) | ![screenshot3](assets/images/screenshots/screenshot3.jpg) |
 
@@ -24,15 +24,15 @@ A Flutter open source mobile app that synchronizes the music rhythm (BPM) to the
 - [x] Modify the adaptive playback rate algorithm to your needs with several options
 - [x] Read explanations for complex settings in tooltips
 - [x] Dark mode
-- [ ] Connect and play songs through external music streaming platforms (Spotify, Apple Music, YouTube Music), supporting adaptive audio playback rate
-- [ ] Easily install from Play Store and App Store
-- [ ] Detect song BPM automatically
-- [ ] Detect song sections with free time or with different tempo
-- [ ] Compensate delay with SPM-BPM phase sync
-- [ ] Dynamically change playlist songs based on current SPM
-- [ ] Change double-time or half-time mode automatically
-- [ ] Control the audio player with headphone buttons
-- [ ] Change app theme
+- [ ] 🚧 Connect and play songs through external music streaming platforms (Spotify, Apple Music, YouTube Music), supporting adaptive audio playback rate
+- [ ] 🚧 Easily install from Play Store and App Store
+- [ ] 🚧 Detect song BPM automatically
+- [ ] 🚧 Detect song sections with free time or with different tempo
+- [ ] 🚧 Compensate delay with SPM-BPM phase sync
+- [ ] 🚧 Dynamically change playlist songs based on current SPM
+- [ ] 🚧 Change double-time or half-time mode automatically
+- [ ] 🚧 Control the audio player with headphone buttons
+- [ ] 🚧 Change app theme
 
 ## Supported platforms
 
