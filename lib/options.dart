@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music_pedometer_ui/themes/theme_provider.dart';
+import 'themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'step_detection_provider.dart';
 import 'models/playlist_provider.dart';

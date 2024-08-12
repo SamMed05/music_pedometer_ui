@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music_pedometer_ui/models/playlist_provider.dart';
+import 'models/playlist_provider.dart';
 import 'navigation_menu.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:provider/provider.dart';

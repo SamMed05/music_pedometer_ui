@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:music_pedometer_ui/themes/dark_mode.dart';
-import 'package:music_pedometer_ui/themes/light_mode.dart';
+import '/themes/dark_mode.dart';
+import '/themes/light_mode.dart';
 
 // Thanks https://youtu.be/Zr4j6W7nmpg
 class ThemeProvider extends ChangeNotifier {

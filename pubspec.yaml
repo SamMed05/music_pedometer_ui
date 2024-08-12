@@ -1,4 +1,4 @@
-name: BeatStride - Music Pedometer
+name: BeatStride
 description: "A Flutter mobile app that synchronizes music rhythm the the steps of the user."
 publish_to: 'none'
 version: 1.3.0

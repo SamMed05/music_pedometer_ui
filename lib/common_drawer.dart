@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:music_pedometer_ui/models/playlist_provider.dart';
+import 'models/playlist_provider.dart';
 import 'package:provider/provider.dart';
 
 class CommonDrawer extends StatefulWidget {
