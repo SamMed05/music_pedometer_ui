@@ -32,7 +32,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
-        android:label="music_pedometer_ui"
+        android:label="BeatStride"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
