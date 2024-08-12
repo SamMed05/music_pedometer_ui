@@ -1,4 +1,4 @@
-package com.example.music_pedometer_ui
+package com.sammed.beatstride
 
 import io.flutter.embedding.android.FlutterActivity
 
