@@ -33,7 +33,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 // TODO Add shuffle
                 IconButton(
                   icon: Icon(
-                    Icons.loop,
+                    Icons.loop_rounded,
                     // TODO Fix colors in dark mode
                     color: playlistProvider.isLooping ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
                   ),
@@ -41,7 +41,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 ),
                 IconButton(
                   onPressed: playlistProvider.playPreviousSong, 
-                  icon: Icon(Icons.skip_previous),
+                  icon: Icon(Icons.skip_previous_rounded),
                   iconSize: 35,
                 ),
                 Container(
@@ -56,7 +56,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                       borderRadius: BorderRadius.all(Radius.circular(100))),
                   child: IconButton(
                     icon: Icon(
-                      playlistProvider.isPlaying ? Icons.pause : Icons.play_arrow,
+                      playlistProvider.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                       size: 42,
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),
@@ -65,7 +65,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 ),
                 IconButton(
                   onPressed: playlistProvider.playNextSong, 
-                  icon: Icon(Icons.skip_next),
+                  icon: Icon(Icons.skip_next_rounded),
                   iconSize: 35,
                 ),
                 // Playback rate display

@@ -26,18 +26,22 @@ class _HomeScreenState extends State<HomeScreen> {
           toolbarHeight: 0, // Remove empty white space
           elevation: 4,
           bottom: TabBar(
+            dividerColor: Theme.of(context).colorScheme.onSecondary,
+            dividerHeight: 1,
+            labelColor: Theme.of(context).colorScheme.primary,
+            // unselectedLabelColor: Theme.of(context).colorScheme.secondary,
             tabs: <Widget>[
               Tab(
-                icon: Icon(Icons.monitor_heart_sharp),
-                // text: 'Rhythm',
+                icon: Icon(Icons.monitor_heart_rounded),
+                text: 'Rhythm',
               ),
               Tab(
-                icon: Icon(Icons.directions_walk_sharp),
-                // text: 'Steps',
+                icon: Icon(Icons.directions_walk_rounded),
+                text: 'Steps',
               ),
               Tab(
-                icon: Icon(Icons.bar_chart_sharp),
-                // text: 'Accelerometer',
+                icon: Icon(Icons.bar_chart_rounded),
+                text: 'Movement',
               ),
             ],
           ),
@@ -89,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
-                                  Icons.question_mark,
+                                  Icons.question_mark_rounded,
                                   size: 13,
                                   color: Colors.white,
                                 ),
@@ -100,199 +104,187 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Consumer<StepDetectionProvider>(
-                            builder: (context, stepDetectionProvider, child) {
-                              final playlistProvider =
-                                  Provider.of<PlaylistProvider>(context,
-                                      listen: false);
-                              final currentSong =
-                                  playlistProvider.getMostRecentSong();
-                              double currentBPM = currentSong?.BPM ??
-                                  0.0; // Get current song BPM or default to 0.0
-                              double currentSPM = stepDetectionProvider
-                                  .currentSPM; // Get current SPM
-                              // double percentageDifference = ((currentSPM - currentBPM) / currentBPM) * 100;
-                              double playbackRateChange =
-                                  playlistProvider.playbackRate - 1.0;
-                              // double playbackRateBPMEquivalent = playbackRateChange * currentBPM;
-                              double currentPlaybackRate =
-                                  playlistProvider.playbackRate;
-
-                              return SizedBox(
-                                height: 270,
-                                // Useful reference: https://help.syncfusion.com/flutter/radial-gauge/axes
-                                child: SfRadialGauge(
-                                  enableLoadingAnimation: true,
-                                  // animationDuration: 2000,
-                                  axes: <RadialAxis>[
-                                    RadialAxis(
-                                      minimum: -100,
-                                      maximum:
-                                          100.01, // With 100 the last label is missing
-                                      showLabels: true,
-                                      showTicks: true,
-                                      minorTicksPerInterval: 4,
-                                      labelsPosition: ElementsPosition.inside,
-                                      axisLabelStyle: GaugeTextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 11,
-                                      ),
-                                      ticksPosition: ElementsPosition.outside,
-                                      minorTickStyle: MinorTickStyle(
-                                          color: const Color(0xFF919191),
-                                          thickness: 1.3,
-                                          length: 0.04,
-                                          lengthUnit: GaugeSizeUnit.factor),
-                                      majorTickStyle: MajorTickStyle(
-                                          color: const Color(0xFF000000),
-                                          thickness: 1.7,
-                                          length: 0.08,
-                                          lengthUnit: GaugeSizeUnit.factor),
-                                      canScaleToFit: true,
-                                      axisLineStyle: AxisLineStyle(
-                                        thickness: 0.15,
-                                        cornerStyle: CornerStyle.bothCurve,
-                                        // color: Colors.black12,
-                                        gradient: SweepGradient(
-                                          center: FractionalOffset.center,
-                                          colors: <Color>[
-                                            Colors.white,
-                                            Colors.black,
-                                            Colors.black,
-                                            Colors.black,
-                                            Colors.white
-                                          ],
-                                          stops: <double>[
-                                            0.0,
-                                            0.25,
-                                            0.5,
-                                            0.75,
-                                            1.0
-                                          ],
-                                          transform: GradientRotation(
-                                              3.1415 / 4), // 45 degrees
-                                        ),
-                                        thicknessUnit: GaugeSizeUnit.factor,
-                                      ),
-                                      pointers: <GaugePointer>[
-                                        // Main pointer (user SPM)
-                                        MarkerPointer(
-                                            value: playbackRateChange * 100,
-                                            markerType: MarkerType.image,
-                                            markerHeight: 28,
-                                            markerWidth: 28,
-                                            markerOffset: 48,
-                                            imageUrl:
-                                                'assets/images/black-rounded-marker-pointer.png'),
-                                        NeedlePointer(
-                                          // value: percentageDifference,
-                                          value: playbackRateChange *
-                                              100, // To match (currentPlaybackRate / 2) * 200 - 100 on the gauge
-                                          // needleLength: 0.55,
-                                          needleLength: 0, // Hide needle
-                                          // enableAnimation: true,
-                                          // animationDuration: 100,
-                                          needleStartWidth: 1.3,
-                                          needleEndWidth: 3,
-                                          knobStyle: KnobStyle(
-                                            knobRadius: 0.4,
-                                            color: Colors.black,
-                                          ),
-                                          tailStyle: TailStyle(
-                                            width: 3,
-                                            length: 0.2,
-                                            color: Colors.black,
-                                            lengthUnit: GaugeSizeUnit.factor,
-                                          ),
-                                        ),
-                                        // Secondary pointer (current playback rate)
-                                        RangePointer(
-                                          // value: playbackRateBPMEquivalent,
-                                          // value: percentageDifference,
-                                          // Thanks https://stackoverflow.com/a/345204/13122341
-                                          value: (currentPlaybackRate / 2) *
-                                                  200 -
-                                              100, // Map (0x)(2x) to (-100)(+100) values
-                                          width: 0.15,
-                                          enableAnimation: true,
-                                          animationDuration: 100,
-                                          color: Colors.grey.withOpacity(0.3),
-                                          sizeUnit: GaugeSizeUnit.factor,
-                                        ),
-                                      ],
-                                      // Circular annotation for the SPM value at the needle tip
-                                      annotations: <GaugeAnnotation>[
-                                        GaugeAnnotation(
-                                          // axisValue: (currentSPM-currentBPM),
-                                          // axisValue: percentageDifference,
-                                          axisValue: playbackRateChange * 100,
-                                          widget: Container(
-                                            width: 33,
-                                            height: 33,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.white,
-                                              border: Border.all(
-                                                  color: Color(0xFF000000),
-                                                  width: 3.0),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                currentSPM.toStringAsFixed(0),
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          // angle: -90,
-                                          positionFactor:
-                                              0.842, // Adjust position to be at the needle tip
-                                        ),
-                                        // Comparison text under the gauge
-                                        GaugeAnnotation(
-                                          widget: Container(
-                                            child: Text(
-                                              'SPM ' +
-                                                  (currentSPM > currentBPM
-                                                      ? '>'
-                                                      : '<') +
-                                                  ' BPM',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          angle: 90,
-                                          positionFactor: 0.8,
-                                        ),
-                                        // Big % text at the center of the gauge
-                                        GaugeAnnotation(
-                                          widget: Container(
-                                            child: Text(
-                                              // '${percentageDifference.toStringAsFixed(0)}%',
-                                              '${(playbackRateChange * 100).toStringAsFixed(0)}%',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                        padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                        child: Consumer<StepDetectionProvider>(
+                          builder: (context, stepDetectionProvider, child) {
+                            final playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
+                            final currentSong = playlistProvider.getMostRecentSong();
+                            double currentBPM = currentSong?.BPM ?? 0.0; // Get current song BPM or default to 0.0
+                            double currentSPM = stepDetectionProvider.currentSPM; // Get current SPM
+                            // double percentageDifference = ((currentSPM - currentBPM) / currentBPM) * 100;
+                            double playbackRateChange = playlistProvider.playbackRate - 1.0;
+                            // double playbackRateBPMEquivalent = playbackRateChange * currentBPM;
+                            double currentPlaybackRate = playlistProvider.playbackRate;
+                        
+                            return SizedBox(
+                              height: 280,
+                              // Useful reference: https://help.syncfusion.com/flutter/radial-gauge/axes
+                              child: SfRadialGauge(
+                                enableLoadingAnimation: true,
+                                animationDuration: 1500,
+                                axes: <RadialAxis>[
+                                  RadialAxis(
+                                    minimum: -100,
+                                    maximum: 100.01, // With 100 the last label is missing
+                                    backgroundImage: AssetImage(Uri.parse('assets/images/background-marker-track.png').toString()),
+                                    canScaleToFit: true, // This also removes bottom empty space
+                                    showLabels: true,
+                                    showTicks: true,
+                                    minorTicksPerInterval: 4,
+                                    labelsPosition: ElementsPosition.inside,
+                                    ticksPosition: ElementsPosition.outside,
+                                    axisLabelStyle: GaugeTextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 11,
                                     ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                                    minorTickStyle: MinorTickStyle(
+                                        color: const Color(0xFF919191),
+                                        thickness: 1.3,
+                                        length: 0.04,
+                                        lengthUnit: GaugeSizeUnit.factor),
+                                    majorTickStyle: MajorTickStyle(
+                                        color: const Color(0xFF000000),
+                                        thickness: 1.7,
+                                        length: 0.08,
+                                        lengthUnit: GaugeSizeUnit.factor),
+                                    axisLineStyle: AxisLineStyle(
+                                      thickness: 0.15,
+                                      cornerStyle: CornerStyle.bothCurve,
+                                      // color: Colors.black12,
+                                      gradient: SweepGradient(
+                                        center: FractionalOffset.center,
+                                        colors: <Color>[
+                                          Colors.white,
+                                          Colors.black,
+                                          Colors.black,
+                                          Colors.black,
+                                          Colors.white
+                                        ],
+                                        stops: <double>[
+                                          0.0,
+                                          0.25,
+                                          0.5,
+                                          0.75,
+                                          1.0
+                                        ],
+                                        transform: GradientRotation(3.1415 / 4), // 45 degrees
+                                      ),
+                                      thicknessUnit: GaugeSizeUnit.factor,
+                                    ),
+                                    pointers: <GaugePointer>[
+                                      // Main pointer (user SPM)
+                                      MarkerPointer(
+                                          value: playbackRateChange * 100,
+                                          markerType: MarkerType.image,
+                                          markerHeight: 28,
+                                          markerWidth: 28,
+                                          markerOffset: 48,
+                                          imageUrl:
+                                              'assets/images/black-rounded-marker-pointer.png'),
+                                      NeedlePointer(
+                                        // value: percentageDifference,
+                                        value: playbackRateChange * 100, // To match (currentPlaybackRate / 2) * 200 - 100 on the gauge
+                                        // needleLength: 0.55,
+                                        needleLength: 0, // Hide needle
+                                        // enableAnimation: true,
+                                        // animationDuration: 100,
+                                        needleStartWidth: 1.3,
+                                        needleEndWidth: 3,
+                                        knobStyle: KnobStyle(
+                                          knobRadius: 0.4,
+                                          color: Colors.black,
+                                        ),
+                                        tailStyle: TailStyle(
+                                          width: 3,
+                                          length: 0.2,
+                                          color: Colors.black,
+                                          lengthUnit: GaugeSizeUnit.factor,
+                                        ),
+                                      ),
+                                      // Secondary pointer (current playback rate)
+                                      RangePointer(
+                                        // value: playbackRateBPMEquivalent,
+                                        // value: percentageDifference,
+                                        
+                                        // Thanks https://stackoverflow.com/a/345204/13122341
+                                        // Map (0x)(2x) to (-100)(+100) values
+                                        value: (currentPlaybackRate / 2) * 200 - 100,
+                                        width: 0.15,
+                                        enableAnimation: true,
+                                        animationDuration: 100,
+                                        color: Colors.grey.withOpacity(0.5),
+                                        cornerStyle: CornerStyle.startCurve,
+                                        sizeUnit: GaugeSizeUnit.factor,
+                                      ),
+                                    ],
+                                    // Circular annotation for the SPM value at the needle tip
+                                    annotations: <GaugeAnnotation>[
+                                      GaugeAnnotation(
+                                        // axisValue: (currentSPM-currentBPM),
+                                        // axisValue: percentageDifference,
+                                        axisValue: playbackRateChange * 100,
+                                        widget: Container(
+                                          width: 33,
+                                          height: 33,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: Color(0xFF000000),
+                                                width: 3.0),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              currentSPM.toStringAsFixed(0),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        // angle: -90,
+                                        positionFactor:
+                                            0.842, // Adjust position to be at the needle tip
+                                      ),
+                                      // Comparison text under the gauge
+                                      GaugeAnnotation(
+                                        widget: Container(
+                                          child: Text(
+                                            'SPM ' +
+                                                (currentSPM > currentBPM
+                                                    ? '>'
+                                                    : '<') +
+                                                ' BPM',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        angle: 90,
+                                        positionFactor: 0.8,
+                                      ),
+                                      // Big % text at the center of the gauge
+                                      GaugeAnnotation(
+                                        widget: Container(
+                                          child: Text(
+                                            // '${percentageDifference.toStringAsFixed(0)}%',
+                                            '${(playbackRateChange * 100).toStringAsFixed(0)}%',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -307,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             // Step Count
                             Padding(
-                              padding: const EdgeInsets.only(top: 18.0),
+                              padding: const EdgeInsets.only(top: 15.0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.center, // Center the row
@@ -346,10 +338,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: 30),
                             // Step Frequency Chart
                             SizedBox(
-                              height: 200, // Set a fixed height
+                              height: 500 / MediaQuery.of(context).devicePixelRatio,
                               child: LineChart(
                                 LineChartData(
                                   lineBarsData: [
@@ -541,7 +533,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Tempo Mode Segmented Button
             Padding(
-              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 7),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -596,7 +588,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          Icons.question_mark,
+                          Icons.question_mark_rounded,
                           size: 13,
                           color: Colors.white,
                         ),

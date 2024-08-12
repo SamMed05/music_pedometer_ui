@@ -99,7 +99,7 @@ class _PlaylistPage extends State<Playlist> {
                 dense: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                 secondary: Icon(
-                  Icons.filter_alt_outlined,
+                  Icons.filter_alt_rounded,
                   // color: Color(0xff212435),
                   size: 24
                 ),
@@ -166,7 +166,7 @@ class _PlaylistPage extends State<Playlist> {
             },
             backgroundColor: Theme.of(context).colorScheme.primary,
             child: Icon(
-              Icons.audio_file,
+              Icons.audio_file_rounded,
               color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
@@ -320,7 +320,6 @@ class _PlaylistPage extends State<Playlist> {
               Padding(
                 padding: EdgeInsets.all(5),
                 child: Checkbox(
-                  // TODO Make chekcbox actually 'checkable'
                   value: playlistProvider.playlist[index].isSelected,
                   onChanged: (value) {
                     setState(() {

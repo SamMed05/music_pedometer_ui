@@ -44,7 +44,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
                 icon: Padding(
                   padding: EdgeInsets.all(4.0),
                   child: Icon(
-                    Icons.home_filled,
+                    Icons.home_rounded,
                     size: 29,
                     // color: Theme.of(context).colorScheme.secondary,
                   ),
@@ -54,7 +54,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
                 icon: Padding(
                   padding: EdgeInsets.all(4.0),
                   child: Icon(
-                    Icons.format_list_bulleted_sharp,
+                    Icons.format_list_bulleted_rounded,
                     size: 29,
                     // color: Theme.of(context).colorScheme.secondary,
                   ),
@@ -64,7 +64,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
                 icon: Padding(
                   padding: EdgeInsets.all(5.0),
                   child: Icon(
-                    Icons.settings,
+                    Icons.settings_rounded,
                     size: 29,
                     // color: Theme.of(context).colorScheme.secondary,
                   ),
